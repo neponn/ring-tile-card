@@ -8,11 +8,11 @@ A card based on the fabulous inbuilt [`tile` card](https://www.home-assistant.io
 
 You can make the ring the star of the show for new, bigger tiles. Here's a cluster of weather sensors.
 
-<img src="https://github.com/neponn/ring-tile-card/blob/main/docs/img/docs/img/weather.png?raw=true" width="500">
+<img src="https://github.com/neponn/ring-tile-card/blob/main/docs/img/weather.png?raw=true" width="500">
 
 Or a cluster of sensors to monitor a server.
 
-<img src="https://github.com/neponn/ring-tile-card/blob/main/docs/img/docs/img/server.png?raw=true" width="500">
+<img src="https://github.com/neponn/ring-tile-card/blob/main/docs/img/server.png?raw=true" width="500">
 
 Or you can go *really* big to make whole new dashboards - good for wall displays. `ring-tile` looks great in dark mode too!
 
