@@ -1,12 +1,14 @@
 import { svg } from "lit";
 import { MID_BOX, RT, VIEW_BOX } from "../const";
 import { getRingPath } from "./getRingPath";
+import { RtRing } from "../rt-ring";
+import { RtRingSvg } from "../rt-ring-svg";
 
-export function extendWithRenderRings(RtRingSvg) {
+export function extendWithRenderRings(RtRingSvg: RtRingSvg) {
   RtRingSvg.prototype.renderGradRing = function (
-    startAngle,
-    endAngle,
-    opacity
+    startAngle: number,
+    endAngle: number,
+    opacity: number
   ) {
     const width = this._ringWidth;
     const segment = getRingPath(startAngle, endAngle, this._outerRadius, width);
@@ -38,9 +40,9 @@ export function extendWithRenderRings(RtRingSvg) {
   };
 
   RtRingSvg.prototype.renderSolidRing = function (
-    startAngle,
-    endAngle,
-    rawValue
+    startAngle: number,
+    endAngle: number,
+    rawValue: number
   ) {
     const width = this._ringWidth;
     const segment = getRingPath(startAngle, endAngle, this._outerRadius, width);

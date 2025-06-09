@@ -1,10 +1,10 @@
 import { svg, nothing } from "lit";
 import { clamp, isNumber } from "../helpers/utilities";
 import { MID_BOX, POS, RT, SCALE } from "../const";
-
+import { RtRingSvg } from "../rt-ring-svg";
 // export function renderText(cfg, value, unit, position) {
-export function extendWithRenderText(RtRingSvg) {
-  RtRingSvg.prototype.renderText = function (value, unit, position) {
+export function extendWithRenderText(RtRingSvg: RtRingSvg) {
+  RtRingSvg.prototype.renderText = function (value: string, unit: string, position: PositionAlignSetting) {
     function scaleFontSize(
       unit = "",
       unitScale = 1.0,
@@ -23,11 +23,11 @@ export function extendWithRenderText(RtRingSvg) {
     }
 
     function renderValueUnitElement(
-      valueSize,
-      unitSize,
-      xShift,
-      yShift,
-      className
+      valueSize: number,
+      unitSize: number,
+      xShift: number,
+      yShift: number,
+      className: string
     ) {
       return svg`
         <text class=${className}
@@ -43,11 +43,11 @@ export function extendWithRenderText(RtRingSvg) {
     }
 
     function renderTextElement(
-      text,
-      textSize,
-      xShift,
-      yShift,
-      className,
+      text: string,
+      textSize: number,
+      xShift: number,
+      yShift: number,
+      className: string,
       textAnchor = "middle"
     ) {
       return svg`
@@ -67,7 +67,7 @@ export function extendWithRenderText(RtRingSvg) {
       //   decimals = this.min_sig_figs - 1;
       // } else {
       let decimals = Math.max(
-        Math.floor(this.min_sig_figs - Math.log10(Math.abs(value))),
+        Math.floor(this.min_sig_figs - Math.log10(Math.abs(Number(value)))),
         0
       );
 

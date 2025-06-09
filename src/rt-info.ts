@@ -1,6 +1,11 @@
-import { html, css, LitElement, nothing } from "lit";
+import { html, css, LitElement, nothing, TemplateResult } from "lit";
 
 export class RtInfo extends LitElement {
+  primary?: string;
+  secondary?: string;
+  large_ring?: boolean;
+  large_secondary?: boolean;
+
   static get properties() {
     return {
       primary: {},
@@ -10,7 +15,7 @@ export class RtInfo extends LitElement {
     };
   }
 
-  render() {
+  render(): TemplateResult {
     if (!this.large_ring) {
       return html`
         <div class="info small">

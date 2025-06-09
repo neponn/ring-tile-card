@@ -1,9 +1,10 @@
 import { svg, nothing } from "lit";
 import { BE, IND, RT, SCALE, VIEW_BOX } from "../const";
 import { getCoordFromDegrees } from "../helpers/utilities";
+import { RtRingSvg } from "../rt-ring-svg";
 
 // Helper function to calculate a "nice" step size
-function calcNiceNum(range, round) {
+function calcNiceNum(range: number, round: boolean) {
   const exponent = Math.floor(Math.log10(range));
   const fraction = range / Math.pow(10, exponent);
   let niceFraction;
@@ -33,7 +34,7 @@ function calcNiceNum(range, round) {
   return niceFraction * Math.pow(10, exponent);
 }
 
-function calcSubdivisions(bigStep) {
+function calcSubdivisions(bigStep: number): [number, number] {
   const oom = Math.pow(10, Math.floor(Math.log10(bigStep)));
   const stepFraction = bigStep / oom;
 
@@ -44,7 +45,7 @@ function calcSubdivisions(bigStep) {
   }
 }
 
-export function extendWithRenderScale(RtRingSvg) {
+export function extendWithRenderScale(RtRingSvg: RtRingSvg) {
   RtRingSvg.prototype.renderScale = function (dialOpacity = 1) {
     const width = this._ringWidth;
     const targetGrandTicks = this.ring_size === 1 ? 3 : 5;
@@ -99,13 +100,13 @@ export function extendWithRenderScale(RtRingSvg) {
     }
 
     // Map a value to its corresponding angle in the range [this._startDegrees, this._endDegrees]
-    const mapValueToDegrees = (value) =>
+    const mapValueToDegrees = (value: number) =>
       this._startDegrees +
       ((this._endDegrees - this._startDegrees) * (value - start)) / range;
 
     const tickStrokeScale = [1, 1, 1, 0.9, 0.8, 0.7][this.ring_size - 1];
 
-    const renderTick = (value, depth) => {
+    const renderTick = (value: number, depth: number) => {
       const degrees =
         (mapValueToDegrees(value) + (this.ring_type === RT.CLOSED ? 180 : 0)) %
         360;
@@ -119,7 +120,7 @@ export function extendWithRenderScale(RtRingSvg) {
       return `M ${p1[0]} ${p1[1]} L ${p2[0]} ${p2[1]}`;
     };
 
-    const renderLabel = (value) => {
+    const renderLabel = (value: number) => {
       // Avoid duplicate labels for min/max
       if (this.bottom_element === BE.MIN_MAX) {
         if (value === this.min || value === this.max) {
@@ -163,7 +164,7 @@ export function extendWithRenderScale(RtRingSvg) {
         stroke-width=${1.8 * tickStrokeScale}
         stroke-opacity=${dialOpacity}
       />`;
-    let grandLabels = nothing;
+    let grandLabels: unknown[] = [];
     if (this.scale === SCALE.TICKS_LABELS) {
       grandLabels = grand.map(renderLabel);
     }
@@ -175,7 +176,7 @@ export function extendWithRenderScale(RtRingSvg) {
         stroke-width=${1.2 * tickStrokeScale}
         stroke-opacity=${0.7 * dialOpacity}
       />`;
-    let majorLabels = nothing;
+    let majorLabels: unknown[] = [];
     if (
       this.scale === SCALE.TICKS_LABELS &&
       this.ring_size > 3 &&

@@ -1,16 +1,16 @@
-export function isNumber(n) {
+export function isNumber(n: any): boolean {
   return !isNaN(parseFloat(n)) && !isNaN(n - 0);
 }
 
-export function clamp(val, min, max) {
+export function clamp(val: number, min: number, max: number): number {
   return val > max ? max : val < min ? min : val;
 }
 
-export function deg2rad(angle) {
+export function deg2rad(angle: number): number {
   return (angle * Math.PI * 2) / 360;
 }
 
-export function getCoordFromDegrees(angle, radius, viewBox) {
+export function getCoordFromDegrees(angle: number, radius: number, viewBox: number): [number, number] {
   const x = -Math.sin(deg2rad(angle));
   const y = Math.cos(deg2rad(angle));
   const coordX = x * radius + viewBox / 2;
@@ -18,7 +18,7 @@ export function getCoordFromDegrees(angle, radius, viewBox) {
   return [coordX, coordY];
 }
 
-export function degreesToCompass(degrees) {
+export function degreesToCompass(degrees: number): string {
   // Normalize the angle to be within 0-360 degrees
   const normalizedDegrees = (degrees % 360 + 360) % 360;
 

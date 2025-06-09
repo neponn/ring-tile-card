@@ -1,9 +1,11 @@
 import { svg } from "lit";
 import { MID_BOX, RT, VIEW_BOX } from "../const";
 import { getCoordFromDegrees } from "../helpers/utilities";
+import { RtRing } from "../rt-ring";
+import { RtRingSvg } from "../rt-ring-svg";
 
-export function extendWithRenderPointer(RtRingSvg) {
-  RtRingSvg.prototype.renderPointer = function (degrees) {
+export function extendWithRenderPointer(RtRingSvg: RtRingSvg) {
+  RtRingSvg.prototype.renderPointer = function (degrees: number) {
     const colour = "color-mix(in srgb, orange 80%, var(--primary-text-color))";
     const startPoint = getCoordFromDegrees(
       this.ring_type === RT.CLOSED ? degrees : (degrees + 180) % 360,
