@@ -1,7 +1,7 @@
 import { VIEW_BOX } from "../const";
 import { getCoordFromDegrees } from "../helpers/utilities";
 
-export function getRingPath(startAngle, endAngle, outerRadius, width) {
+export function getRingPath(startAngle: number, endAngle: number, outerRadius: number, width: number): string {
   const innerRadius = outerRadius - width;
   const longPathFlag = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
   const outerStart = getCoordFromDegrees(

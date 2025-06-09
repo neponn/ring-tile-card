@@ -1,13 +1,13 @@
-import { ref } from "lit/directives/ref.js";
+import { ref } from "lit/directives/ref";
 import { BE, IND, MDI_ICON_SIZE, POS, RT, SCALE } from "../const";
 import { html } from "lit";
-
+import { RtRingSvg} from "../rt-ring-svg";
 // TODO: Find a way to convert this back to SVG
 
-export function extendWithRenderIcon(RtRingSvg) {
+export function extendWithRenderIcon(RtRingSvg: RtRingSvg) {
   RtRingSvg.prototype.renderIcon = function (
-    position,
-    iconStateObj,
+    position: keyof typeof POS,
+    iconStateObj: any,
     stateColourValue = undefined
   ) {
     let scale;
@@ -47,12 +47,12 @@ export function extendWithRenderIcon(RtRingSvg) {
         className = "icon bottom";
         break;
     }
-
+    if (!scale) {scale = 1;}
+    if (!translateDown) {translateDown = 0;}
     const size = MDI_ICON_SIZE * scale;
     const translateY = translateDown * scale;
 
-    // Use a `ref` to access the `ha-state-icon` element after rendering
-    const iconRef = (el) => {
+    const iconRef = (el: any) => { //Idk what el does, be any
       if (el) {
         const checkForSvgIcon = () => {
           const haIcon = el.shadowRoot?.querySelector("ha-icon");

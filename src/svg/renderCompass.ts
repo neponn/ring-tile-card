@@ -1,8 +1,9 @@
-import { svg } from "lit";
+import { svg, nothing } from "lit";
 import { RT, VIEW_BOX } from "../const";
 import { degreesToCompass, getCoordFromDegrees } from "../helpers/utilities";
+import { RtRingSvg } from "../rt-ring-svg";
 
-export function extendWithRenderCompass(RtRingSvg) {
+export function extendWithRenderCompass(RtRingSvg: RtRingSvg) {
   RtRingSvg.prototype.renderCompass = function () {
     const width = this._ringWidth * 0.7;
 

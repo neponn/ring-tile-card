@@ -5,6 +5,12 @@ import { RtRing } from "./rt-ring";
 import { RtRingSvg } from "./rt-ring-svg";
 import * as pkg from "../package.json";
 
+declare global {
+  interface Window {
+    customCards?: any[];
+  }
+}
+
 console.info(
   `%c ring-tile-card %c v${pkg.version} `,
   'color: yellow; font-weight: bold; background: darkblue',

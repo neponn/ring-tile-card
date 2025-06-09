@@ -1,4 +1,4 @@
-function addLink(id, href, rel, co = false) {
+function addLink(id: string, href: string, rel: string, co: boolean = false) {
   if (!document.getElementById(id)) {
     var link = document.createElement("link");
     link.id = id;

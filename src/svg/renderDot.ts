@@ -2,9 +2,10 @@ import { svg } from "lit";
 import { MID_BOX, RT, VIEW_BOX } from "../const";
 import { getRingPath } from "./getRingPath";
 import { getCoordFromDegrees } from "../helpers/utilities";
+import { RtRingSvg } from "../rt-ring-svg";
 
-export function extendWithRenderDot(RtRingSvg) {
-  RtRingSvg.prototype.renderDot = function (degrees, rawValue) {
+export function extendWithRenderDot(RtRingSvg: RtRingSvg) {
+  RtRingSvg.prototype.renderDot = function (degrees: number, rawValue: number) {
     const width = this._ringWidth;
     const radius = this._outerRadius - width / 2;
     const dotCoord = getCoordFromDegrees(degrees, radius, VIEW_BOX);

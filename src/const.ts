@@ -3,7 +3,7 @@ export const VIEW_BOX = 100; // SVG viewBox for scaling
 export const MID_BOX = VIEW_BOX / 2; // SVG viewBox midpoint for scaling
 export const MDI_ICON_SIZE = 24; // hard coded MDI SVG viewBox
 
-export const HA_COLOURS = {
+export const HA_COLOURS: Record<string, string> = {
   ha_red: "rgb(244,67,54)", // hsl(4, 90%, 58%)
   ha_orange: "rgb(255,152,1)", // hsl(36, 100%, 50%)
   ha_yellow: "rgb(255,193,7)", // hsl(45, 100%, 51%)

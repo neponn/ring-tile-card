@@ -1,6 +1,15 @@
 import { LitElement, html, css, nothing, svg } from "lit";
+import { classMap } from "lit/directives/class-map";
+
+// Default style class for tile icon border
+const DEFAULT_TILE_ICON_BORDER_STYLE = "rounded-square";
 
 export class RtRing extends LitElement {
+  interactive?: boolean;
+  imageStyle?: string;
+  imageUrl?: string;
+  ring_size?: string;
+
   static get properties() {
     return {
       interactive: {},

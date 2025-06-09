@@ -1,9 +1,10 @@
 import { svg } from "lit";
 import { IND, MID_BOX, RT, VIEW_BOX } from "../const";
 import { clamp, deg2rad, getCoordFromDegrees } from "../helpers/utilities";
+import { RtRingSvg } from "../rt-ring-svg";
 
-export function extendWithRenderMarker(RtRingSvg) {
-  RtRingSvg.prototype.renderMarker = function (markerValue, markerColour) {
+export function extendWithRenderMarker(RtRingSvg: RtRingSvg) {
+  RtRingSvg.prototype.renderMarker = function (markerValue: number, markerColour: string) {
     const width = this._ringWidth;
 
     let degrees;
@@ -12,7 +13,7 @@ export function extendWithRenderMarker(RtRingSvg) {
     let className = "marker";
 
     if (this.ring_type.startsWith(RT.COMPASS)) {
-      degrees = parseFloat(markerValue);
+      degrees = parseFloat(String(markerValue));
       markerWidth = 2.3 * width;
       strokeWidth = 0; // width / 8;
       degrees = (degrees + 180) % 360;
