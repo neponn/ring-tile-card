@@ -32,3 +32,15 @@ Read how to install and use `ring-tile` card:
 * A few [advanced](https://github.com/neponn/ring-tile-card/blob/main/docs/advanced.md) options using [card-mod](https://github.com/thomasloven/lovelace-card-mod) for dynamic styling as well as some useful custom sensors
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=neponn&repository=ring-tile-card&category=plugin)
+
+## Discussion
+
+If you need help or would like to discuss `ring-tile` card, reach out on the [Home Assistant community forum](https://community.home-assistant.io/t/ring-tile-card-visualise-your-sensor-data/899257). I would love to know how you are using `ring-tile` card - share a few screen shots and YAML config!
+
+## Support
+
+If something is broken or you have an idea about how to make `ring-tile` card better, create a bug report or feature request [issue](https://github.com/neponn/ring-tile-card/issues). Even better, fork and create a pull request!
+
+If you'd like to say thanks, I love coffee...
+
+<a href="https://www.buymeacoffee.com/neponn" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" height="41" width="174"></a>
