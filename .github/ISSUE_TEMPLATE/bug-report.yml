@@ -6,8 +6,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-        If you just need help, please use the [ring-tile discusson](https://community.home-assistant.io/t/ring-tile-card-visualise-your-sensor-data/899257).
-        on the community forums.
+        If you just need help, please use the [ring-tile discusson](https://community.home-assistant.io/t/ring-tile-card-visualise-your-sensor-data/899257) on the community forums.
         **NOTE!** I may take me a while to get back to you. Please bear with me!
   - type: textarea
     id: ha_version
