@@ -41,6 +41,4 @@ If you need help or would like to discuss `ring-tile` card, reach out on the [Ho
 
 If something is broken or you have an idea about how to make `ring-tile` card better, create a bug report or feature request [issue](https://github.com/neponn/ring-tile-card/issues). Even better, fork and create a pull request!
 
-If you'd like to say thanks, I love coffee...
-
 <a href="https://www.buymeacoffee.com/neponn" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" height="41" width="174"></a>
