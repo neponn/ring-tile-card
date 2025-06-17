@@ -1,4 +1,5 @@
 node_modules/
 dist/ring-tile-card.js.map
+build/
 .parcel-cache/
 .vscode
