@@ -1,0 +1,38 @@
+name: Build and release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pre check
+        run: ls -al /home/runner/work/ring-tile-card/ring-tile-card/
+
+      - name: Build
+        run: |
+          cd /home/runner/work/ring-tile-card/ring-tile-card
+          npm install
+          npm run build
+
+      - name: Post check
+        run: ls -al /home/runner/work/ring-tile-card/ring-tile-card/dist/
+
+        # Upload build file to the release as an asset.
+      - name: Upload as release asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: /home/runner/work/ring-tile-card/ring-tile-card/dist/ring-tile-card.js
+          asset_name: ring-tile-card.js
+          tag: ${{ github.ref }}
+          overwrite: true

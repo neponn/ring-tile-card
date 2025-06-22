@@ -1,6 +1,6 @@
 {
   "name": "ring-tile-card",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Home Assistant card to visualise your sensor data, based on tile card",
   "author": "neponn",
   "license": "MIT",
@@ -9,11 +9,19 @@
     "url": "https://github.com/neponn/ring-tile-card.git"
   },
   "source": "src/ring-tile-card.js",
+  "scripts": {
+    "start": "parcel",
+    "build": "parcel build"
+  },
   "type": "module",
   "devDependencies": {
     "parcel": "^2.15.2"
   },
   "dependencies": {
     "lit": "^3.1.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/neponn/ring-tile-card/issues"
+  },
+  "homepage": "https://github.com/neponn/ring-tile-card#readme"
 }
