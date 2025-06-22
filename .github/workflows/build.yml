@@ -10,7 +10,7 @@ on:
       - dev
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
