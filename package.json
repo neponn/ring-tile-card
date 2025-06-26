@@ -11,7 +11,7 @@
   "source": "src/ring-tile-card.js",
   "scripts": {
     "start": "parcel",
-    "build": "parcel build"
+    "build": "parcel build --no-source-maps"
   },
   "type": "module",
   "devDependencies": {
