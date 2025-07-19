@@ -237,7 +237,7 @@ export class RingTile extends LitElement {
 
   render() {
     const stateStr = this._ringStateObj
-      ?  parseFloat(this._ringElement.value)
+      ? parseFloat(this._ringElement.value)
       : "unavailable";
     console.info(
       `render(): ${this._name} (${this._displayStateObj.state} ${this._displayStateObj.attributes.unit_of_measurement})`
@@ -249,13 +249,8 @@ export class RingTile extends LitElement {
             .stateObj=${this._displayStateObj}
             .hass=${this._hass}
             .name=${this._name}
-            .content=${this._displayElement.elementType === TE_TYPE.ATTRIBUTE
-              ? this._displayElement.elementName
-              : nothing}          >
-          </state-display>
+          ></state-display>
         `;
-
-
 
     // const stateDisplay = html`
     //   <state-display
