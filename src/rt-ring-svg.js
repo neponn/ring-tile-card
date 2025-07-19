@@ -24,6 +24,8 @@ import {
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
 
 export class RtRingSvg extends LitElement {
+  // hass;
+
   constructor(...args) {
     super(...args);
 
@@ -95,12 +97,16 @@ export class RtRingSvg extends LitElement {
       }
     }
 
-    this._ringUnit = this.state
-      ? this.state.attributes["unit_of_measurement"]
-      : nothing;
+    // this._ringUnit = this.state
+    //   ? this.state.attributes["unit_of_measurement"]
+    //   : nothing;
+    this._ringUnit = this.state ? this.state.unitOfMeasurement : nothing;
 
+    // this._displayUnit = this.display_state
+    //   ? this.display_state.attributes["unit_of_measurement"]
+    //   : nothing;
     this._displayUnit = this.display_state
-      ? this.display_state.attributes["unit_of_measurement"]
+      ? this.display_state.unitOfMeasurement
       : nothing;
 
     const scaleDef = {
@@ -154,8 +160,8 @@ export class RtRingSvg extends LitElement {
         const value = [ME.RING_VALUE, ME.RING_VALUE_UNIT].includes(
           this.middle_element
         )
-          ? this.state.state
-          : this.display_state.state;
+          ? this.state.value //.state
+          : this.display_state.value; //.state;
 
         let unit = "";
         if (this.middle_element === ME.VALUE_UNIT) {
@@ -212,8 +218,8 @@ export class RtRingSvg extends LitElement {
         const value = [BE.RING_VALUE, BE.RING_VALUE_UNIT].includes(
           this.bottom_element
         )
-          ? this.state.state
-          : this.display_state.state;
+          ? this.value //.state
+          : this.display_state.value; //.state;
 
         let unit = "";
         if (this.bottom_element === BE.VALUE_UNIT) {
@@ -230,13 +236,14 @@ export class RtRingSvg extends LitElement {
   }
 
   render() {
+    console.info(`svg-render(): ${this.name} (${this.state.value} ${this.state.unitOfMeasurement})`)
     // set up the ring based on config
     this.configureRing();
 
     // figure out ring parameters based on current state
-    this._noState = ["unknown", "unavailable"].includes(this.state.state);
+    this._noState = ["unknown", "unavailable"].includes(this.state.value);//.state);
 
-    let clampedState = clamp(this.state.state, this.min, this.max);
+    let clampedState = clamp(this.state.value, this.min, this.max); //.state, this.min, this.max);
     let statePoint =
       this._startDegrees +
       ((this._endDegrees - this._startDegrees) * (clampedState - this.min)) /
@@ -280,11 +287,11 @@ export class RtRingSvg extends LitElement {
           indicatorBottom = this.renderSolidRing(
             this._startDegrees,
             statePoint,
-            this.state.state
+            this.state.value //.state
           );
           break;
         case IND.DOT:
-          indicatorBottom = this.renderDot(statePoint, this.state.state);
+          indicatorBottom = this.renderDot(statePoint, this.state.value); //.state);
           break;
         case IND.POINTER:
           indicatorTop = this.renderPointer(statePoint);
@@ -314,15 +321,15 @@ export class RtRingSvg extends LitElement {
     // render icon to html (not SVG), prioritised by position
     let stateColourValue;
     if (this.colourise_icon) {
-      stateColourValue = this.state.state;
+      stateColourValue = this.state.value; //.state;
     }
     const iconHtml =
       this.middle_element === ME.ICON
-        ? this.renderIcon(POS.MIDDLE, this.display_state, stateColourValue)
+        ? this.renderIcon(POS.MIDDLE, this.display_state.stateObj, stateColourValue)
         : this.top_element === TE.ICON
-        ? this.renderIcon(POS.TOP, this.display_state, stateColourValue)
+        ? this.renderIcon(POS.TOP, this.display_state.stateObj, stateColourValue)
         : this.bottom_element === BE.ICON
-        ? this.renderIcon(POS.BOTTOM, this.display_state, stateColourValue)
+        ? this.renderIcon(POS.BOTTOM, this.display_state.stateObj, stateColourValue)
         : nothing;
 
     // render the top, middle and bottom elements

@@ -1,4 +1,4 @@
-import { LitElement, html, css, nothing, svg } from "lit";
+import { LitElement, html, css, nothing } from "lit";
 import { classMap } from "lit/directives/class-map";
 import { ifDefined } from "lit/directives/if-defined";
 
@@ -11,22 +11,28 @@ import {
   MEDIUM_DEFAULTS,
 } from "./defaults.js";
 import { clamp, isNumber } from "./helpers/utilities.js";
+import { TrackedElement, TE_TYPE } from "./helpers/trackedElement.js";
 
 export class RingTile extends LitElement {
   _noState;
   _configProcessed = false;
+  // _hass;
+  // _ringElement;
+  // _displayElement;
 
   static get properties() {
     return {
       _hass: { attribute: false },
       _cfg: { state: true },
 
+      _ringElement: { state: true },
+      _displayElement: { state: true },
       _ringStateObj: { state: true },
       _displayStateObj: { state: true },
       _markerValue: { state: true },
       _marker2Value: { state: true },
-      _min: { state: true },
-      _max: { state: true },
+      _minValue: { state: true },
+      _maxValue: { state: true },
     };
   }
 
@@ -54,8 +60,10 @@ export class RingTile extends LitElement {
     }
 
     // Figure out what we can learn about the entity
-    const deviceClass = this._ringStateObj.attributes.device_class;
-    const measurementUnit = this._ringStateObj.attributes.unit_of_measurement;
+    // const deviceClass = this._ringElement.attributes.device_class;
+    // const measurementUnit = this._ringElement.attributes.unit_of_measurement;
+    const deviceClass = this._ringElement.deviceClass;
+    const measurementUnit = this._ringElement.unitOfMeasurement;
     const isCompass =
       this._cfg.ring_type && this._cfg.ring_type.startsWith(RT.COMPASS);
 
@@ -123,11 +131,15 @@ export class RingTile extends LitElement {
     this._cfg.ring_only = this._cfg.ring_only || this._cfg.ring_size >= 3;
 
     // Handle config that can have entities or values supplied
-    if (isNumber(this._cfg.marker)) {
-      this._markerValue = parseFloat(this._cfg.marker);
-    } else {
-      this._markerEntity = this._cfg.marker;
-    }
+    // if (isNumber(this._cfg.marker)) {
+    //   this._markerValue = parseFloat(this._cfg.marker);
+    // } else {
+    //   this._markerElement = this._cfg.marker;
+    // }
+    // if (this._cfg.marker) {
+    //   // console.info("New TrackedElement for this._cfg.marker")
+    //   this._markerElement = new TrackedElement(this._cfg.marker, this._hass);
+    // }
     if (isNumber(this._cfg.marker2)) {
       this._marker2Value = parseFloat(this._cfg.marker2);
     } else {
@@ -135,14 +147,14 @@ export class RingTile extends LitElement {
     }
 
     if (isNumber(this._cfg.min)) {
-      this._min = parseFloat(this._cfg.min);
+      this._minValue = parseFloat(this._cfg.min);
     } else {
       if (this._cfg.min) {
         this._minEntity = this._cfg.min;
       }
     }
     if (isNumber(this._cfg.max)) {
-      this._max = parseFloat(this._cfg.max);
+      this._maxValue = parseFloat(this._cfg.max);
     } else {
       if (this._cfg.max) {
         this._maxEntity = this._cfg.max;
@@ -170,23 +182,32 @@ export class RingTile extends LitElement {
   set hass(hass) {
     this._hass = hass;
 
-    this._ringStateObj = hass.states[this._cfg.ring_entity || this._cfg.entity];
-    const ringValue = this._ringStateObj
-      ? this._ringStateObj.state
+    // this._ringElement = hass.states[this._cfg.ring_entity || this._cfg.entity];
+    this._ringElement = new TrackedElement(
+      this._cfg.ring_entity || this._cfg.entity,
+      hass
+    );
+    this._ringStateObj = this._ringElement.stateObj;
+    const ringValue = this._ringStateObj // this._ringElement.stateObj
+      ? parseFloat(this._ringElement.value)
       : "unavailable";
     this._noState = ["unavailable", "unknown"].includes(ringValue);
 
-    this._displayStateObj = hass.states[this._cfg.entity];
+    // this._displayElement = hass.states[this._cfg.entity];
+    this._displayElement = new TrackedElement(this._cfg.entity, hass);
+    this._displayStateObj = this._displayElement.stateObj;
 
     if (this._ringStateObj && !this._configProcessed) {
       this.processConfig();
     }
 
-    if (this._markerEntity) {
-      const markerStateObj = hass.states[this._markerEntity];
-      if (markerStateObj) {
-        this._markerValue = markerStateObj.state;
-      }
+    if (this._cfg.marker) {
+      this._markerElement = new TrackedElement(this._cfg.marker, this._hass);
+      this._markerValue = parseFloat(this._markerElement.value);
+      // const markerStateObj = hass.states[this._markerElement];
+      // if (markerStateObj) {
+      //   this._markerValue = markerStateObj.state;
+      // }
     }
 
     if (this._marker2Entity) {
@@ -199,25 +220,28 @@ export class RingTile extends LitElement {
     if (this._minEntity) {
       const minStateObj = hass.states[this._minEntity];
       if (minStateObj) {
-        this._min = parseFloat(minStateObj.state);
+        this._minValue = parseFloat(minStateObj.state);
       }
     }
     if (this._maxEntity) {
       const maxStateObj = hass.states[this._maxEntity];
       if (maxStateObj) {
-        this._max = parseFloat(maxStateObj.state);
+        this._maxValue = parseFloat(maxStateObj.state);
       }
     }
     // Handle the case that min == max to avoid annoying edge cases
-    if (this._min === this._max) {
-      this._max += 0.00000000001;
+    if (this._minValue === this._maxValue) {
+      this._maxValue += 0.00000000001;
     }
   }
 
   render() {
     const stateStr = this._ringStateObj
-      ? this._ringStateObj.state
+      ?  parseFloat(this._ringElement.value)
       : "unavailable";
+    console.info(
+      `render(): ${this._name} (${this._displayStateObj.state} ${this._displayStateObj.attributes.unit_of_measurement})`
+    );
     const stateDisplay = this._cfg.hide_state
       ? nothing
       : html`
@@ -225,9 +249,20 @@ export class RingTile extends LitElement {
             .stateObj=${this._displayStateObj}
             .hass=${this._hass}
             .name=${this._name}
-          >
+            .content=${this._displayElement.elementType === TE_TYPE.ATTRIBUTE
+              ? this._displayElement.elementName
+              : nothing}          >
           </state-display>
         `;
+
+
+
+    // const stateDisplay = html`
+    //   <state-display
+    //     .stateObj=${this._hass.states[this._cfg.entity]}
+    //     .hass=${this._hass}
+    //   ></state-display>
+    // `;
 
     const ringPixels = [36, 96, 154, 212, 270, 330][this._cfg.ring_size - 1];
     const contentClasses = {
@@ -269,8 +304,8 @@ export class RingTile extends LitElement {
                 indicator=${this._cfg.indicator}
                 scale=${this._cfg.scale}
                 .colour=${this._cfg.colour}
-                .state=${this._ringStateObj}
-                .display_state=${this._displayStateObj}
+                .state=${this._ringElement}
+                .display_state=${this._displayElement}
                 .marker_value=${this._markerValue}
                 .marker_colour=${this._cfg.marker_colour}
                 .marker2_value=${this._marker2Value}
@@ -282,8 +317,8 @@ export class RingTile extends LitElement {
                 .bottom_element=${this._cfg.bottom_element}
                 .bottom_name=${this._cfg.bottom_name}
                 .name=${this._name}
-                .min=${this._min}
-                .max=${this._max}
+                .min=${this._minValue}
+                .max=${this._maxValue}
                 .min_sig_figs=${this._cfg.min_sig_figs}
                 .max_decimals=${this._cfg.max_decimals}
                 .hass=${this._hass}
@@ -500,8 +535,8 @@ export class RingTile extends LitElement {
 
     const entityId =
       actionConfig.tapped === "icon" && this._cfg.ring_entity
-        ? this._cfg.ring_entity
-        : this._cfg.entity;
+        ? this._ringElement.entityName
+        : this._displayElement.entityName;
 
     switch (actionConfig.action) {
       case "more-info":
