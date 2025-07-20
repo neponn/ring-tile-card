@@ -24,8 +24,6 @@ import {
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
 
 export class RtRingSvg extends LitElement {
-  // hass;
-
   constructor(...args) {
     super(...args);
 
@@ -97,14 +95,7 @@ export class RtRingSvg extends LitElement {
       }
     }
 
-    // this._ringUnit = this.state
-    //   ? this.state.attributes["unit_of_measurement"]
-    //   : nothing;
     this._ringUnit = this.state ? this.state.unitOfMeasurement : nothing;
-
-    // this._displayUnit = this.display_state
-    //   ? this.display_state.attributes["unit_of_measurement"]
-    //   : nothing;
     this._displayUnit = this.display_state
       ? this.display_state.unitOfMeasurement
       : nothing;
@@ -236,7 +227,6 @@ export class RtRingSvg extends LitElement {
   }
 
   render() {
-    console.info(`svg-render(): ${this.name} (${this.state.value} ${this.state.unitOfMeasurement})`)
     // set up the ring based on config
     this.configureRing();
 

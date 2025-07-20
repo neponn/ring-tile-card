@@ -16,17 +16,12 @@ import { TrackedElement, TE_TYPE } from "./helpers/trackedElement.js";
 export class RingTile extends LitElement {
   _noState;
   _configProcessed = false;
-  // _hass;
-  // _ringElement;
-  // _displayElement;
 
   static get properties() {
     return {
       _hass: { attribute: false },
       _cfg: { state: true },
 
-      _ringElement: { state: true },
-      _displayElement: { state: true },
       _ringStateObj: { state: true },
       _displayStateObj: { state: true },
       _markerValue: { state: true },
@@ -130,37 +125,6 @@ export class RingTile extends LitElement {
 
     this._cfg.ring_only = this._cfg.ring_only || this._cfg.ring_size >= 3;
 
-    // Handle config that can have entities or values supplied
-    // if (isNumber(this._cfg.marker)) {
-    //   this._markerValue = parseFloat(this._cfg.marker);
-    // } else {
-    //   this._markerElement = this._cfg.marker;
-    // }
-    // if (this._cfg.marker) {
-    //   // console.info("New TrackedElement for this._cfg.marker")
-    //   this._markerElement = new TrackedElement(this._cfg.marker, this._hass);
-    // }
-    if (isNumber(this._cfg.marker2)) {
-      this._marker2Value = parseFloat(this._cfg.marker2);
-    } else {
-      this._marker2Entity = this._cfg.marker2;
-    }
-
-    if (isNumber(this._cfg.min)) {
-      this._minValue = parseFloat(this._cfg.min);
-    } else {
-      if (this._cfg.min) {
-        this._minEntity = this._cfg.min;
-      }
-    }
-    if (isNumber(this._cfg.max)) {
-      this._maxValue = parseFloat(this._cfg.max);
-    } else {
-      if (this._cfg.max) {
-        this._maxEntity = this._cfg.max;
-      }
-    }
-
     this._configProcessed = true;
   }
 
@@ -182,18 +146,14 @@ export class RingTile extends LitElement {
   set hass(hass) {
     this._hass = hass;
 
-    // this._ringElement = hass.states[this._cfg.ring_entity || this._cfg.entity];
     this._ringElement = new TrackedElement(
       this._cfg.ring_entity || this._cfg.entity,
       hass
     );
     this._ringStateObj = this._ringElement.stateObj;
-    const ringValue = this._ringStateObj // this._ringElement.stateObj
-      ? parseFloat(this._ringElement.value)
-      : "unavailable";
+    const ringValue = this._ringElement.value; 
     this._noState = ["unavailable", "unknown"].includes(ringValue);
 
-    // this._displayElement = hass.states[this._cfg.entity];
     this._displayElement = new TrackedElement(this._cfg.entity, hass);
     this._displayStateObj = this._displayElement.stateObj;
 
@@ -201,33 +161,23 @@ export class RingTile extends LitElement {
       this.processConfig();
     }
 
-    if (this._cfg.marker) {
+    if (this._cfg.marker != null) {
       this._markerElement = new TrackedElement(this._cfg.marker, this._hass);
       this._markerValue = parseFloat(this._markerElement.value);
-      // const markerStateObj = hass.states[this._markerElement];
-      // if (markerStateObj) {
-      //   this._markerValue = markerStateObj.state;
-      // }
     }
 
-    if (this._marker2Entity) {
-      const marker2StateObj = hass.states[this._marker2Entity];
-      if (marker2StateObj) {
-        this._marker2Value = marker2StateObj.state;
-      }
+    if (this._cfg.marker2 != null) {
+      this._marker2Element = new TrackedElement(this._cfg.marker2, this._hass);
+      this._marker2Value = parseFloat(this._marker2Element.value);
     }
 
-    if (this._minEntity) {
-      const minStateObj = hass.states[this._minEntity];
-      if (minStateObj) {
-        this._minValue = parseFloat(minStateObj.state);
-      }
+    if (this._cfg.min != null) {
+      this._minElement = new TrackedElement(this._cfg.min, this._hass);
+      this._minValue = parseFloat(this._minElement.value);
     }
-    if (this._maxEntity) {
-      const maxStateObj = hass.states[this._maxEntity];
-      if (maxStateObj) {
-        this._maxValue = parseFloat(maxStateObj.state);
-      }
+    if (this._cfg.max != null) {
+      this._maxElement = new TrackedElement(this._cfg.max, this._hass);
+      this._maxValue = parseFloat(this._maxElement.value);
     }
     // Handle the case that min == max to avoid annoying edge cases
     if (this._minValue === this._maxValue) {
@@ -239,9 +189,7 @@ export class RingTile extends LitElement {
     const stateStr = this._ringStateObj
       ? parseFloat(this._ringElement.value)
       : "unavailable";
-    console.info(
-      `render(): ${this._name} (${this._displayStateObj.state} ${this._displayStateObj.attributes.unit_of_measurement})`
-    );
+
     const stateDisplay = this._cfg.hide_state
       ? nothing
       : html`
@@ -251,13 +199,6 @@ export class RingTile extends LitElement {
             .name=${this._name}
           ></state-display>
         `;
-
-    // const stateDisplay = html`
-    //   <state-display
-    //     .stateObj=${this._hass.states[this._cfg.entity]}
-    //     .hass=${this._hass}
-    //   ></state-display>
-    // `;
 
     const ringPixels = [36, 96, 154, 212, 270, 330][this._cfg.ring_size - 1];
     const contentClasses = {
