@@ -1,5 +1,9 @@
 # Ring Tile Card
 
+[![GitHub Release](https://img.shields.io/github/release/neponn/ring-tile-card?style=for-the-badge&logo=github&label=Release)](https://github.com/neponn/ring-tile-card)
+![GitHub Downloads](https://img.shields.io/github/downloads/neponn/ring-tile-card/latest/total?style=for-the-badge&label=Downloads)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+
 It's a [Home Assistant](https://www.home-assistant.io) `tile` card! With a ring!
 
 A card based on the fabulous inbuilt [`tile` card](https://www.home-assistant.io/dashboards/tile/) to visualise your sensor data. Use `ring-tile` cards to bring your sensor `tile` cards to life. Gain insights from your home's data at a glance.

@@ -10,8 +10,8 @@ import {
   LARGE_DEFAULTS,
   MEDIUM_DEFAULTS,
 } from "./defaults.js";
-import { clamp, isNumber } from "./helpers/utilities.js";
-import { TrackedElement, TE_TYPE } from "./helpers/trackedElement.js";
+import { clamp } from "./helpers/utilities.js";
+import { TrackedObject } from "./helpers/trackedObject.js";
 
 export class RingTile extends LitElement {
   _noState;
@@ -146,7 +146,7 @@ export class RingTile extends LitElement {
   set hass(hass) {
     this._hass = hass;
 
-    this._ringElement = new TrackedElement(
+    this._ringElement = new TrackedObject(
       this._cfg.ring_entity || this._cfg.entity,
       hass
     );
@@ -154,7 +154,7 @@ export class RingTile extends LitElement {
     const ringValue = this._ringElement.value; 
     this._noState = ["unavailable", "unknown"].includes(ringValue);
 
-    this._displayElement = new TrackedElement(this._cfg.entity, hass);
+    this._displayElement = new TrackedObject(this._cfg.entity, hass);
     this._displayStateObj = this._displayElement.stateObj;
 
     if (this._ringStateObj && !this._configProcessed) {
@@ -162,21 +162,21 @@ export class RingTile extends LitElement {
     }
 
     if (this._cfg.marker != null) {
-      this._markerElement = new TrackedElement(this._cfg.marker, this._hass);
+      this._markerElement = new TrackedObject(this._cfg.marker, this._hass);
       this._markerValue = parseFloat(this._markerElement.value);
     }
 
     if (this._cfg.marker2 != null) {
-      this._marker2Element = new TrackedElement(this._cfg.marker2, this._hass);
+      this._marker2Element = new TrackedObject(this._cfg.marker2, this._hass);
       this._marker2Value = parseFloat(this._marker2Element.value);
     }
 
     if (this._cfg.min != null) {
-      this._minElement = new TrackedElement(this._cfg.min, this._hass);
+      this._minElement = new TrackedObject(this._cfg.min, this._hass);
       this._minValue = parseFloat(this._minElement.value);
     }
     if (this._cfg.max != null) {
-      this._maxElement = new TrackedElement(this._cfg.max, this._hass);
+      this._maxElement = new TrackedObject(this._cfg.max, this._hass);
       this._maxValue = parseFloat(this._maxElement.value);
     }
     // Handle the case that min == max to avoid annoying edge cases
