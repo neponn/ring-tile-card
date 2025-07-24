@@ -151,8 +151,8 @@ export class RtRingSvg extends LitElement {
         const value = [ME.RING_VALUE, ME.RING_VALUE_UNIT].includes(
           this.middle_element
         )
-          ? this.state.value //.state
-          : this.display_state.value; //.state;
+          ? this.state.value
+          : this.display_state.value;
 
         let unit = "";
         if (this.middle_element === ME.VALUE_UNIT) {
@@ -209,8 +209,8 @@ export class RtRingSvg extends LitElement {
         const value = [BE.RING_VALUE, BE.RING_VALUE_UNIT].includes(
           this.bottom_element
         )
-          ? this.value //.state
-          : this.display_state.value; //.state;
+          ? this.value 
+          : this.display_state.value;
 
         let unit = "";
         if (this.bottom_element === BE.VALUE_UNIT) {
@@ -231,9 +231,9 @@ export class RtRingSvg extends LitElement {
     this.configureRing();
 
     // figure out ring parameters based on current state
-    this._noState = ["unknown", "unavailable"].includes(this.state.value);//.state);
+    this._noState = ["unknown", "unavailable"].includes(this.state.value);
 
-    let clampedState = clamp(this.state.value, this.min, this.max); //.state, this.min, this.max);
+    let clampedState = clamp(this.state.value, this.min, this.max);
     let statePoint =
       this._startDegrees +
       ((this._endDegrees - this._startDegrees) * (clampedState - this.min)) /
@@ -247,7 +247,7 @@ export class RtRingSvg extends LitElement {
 
     let ringBackgroundOpacity = 0.15;
     if (this.indicator === IND.DOT) {
-      ringBackgroundOpacity = 0.7; //0.4;
+      ringBackgroundOpacity = 0.7;
     } else if (this.indicator === IND.POINTER) {
       ringBackgroundOpacity = 0.07;
     } else if (this.scale === IND.NONE) {
@@ -277,11 +277,11 @@ export class RtRingSvg extends LitElement {
           indicatorBottom = this.renderSolidRing(
             this._startDegrees,
             statePoint,
-            this.state.value //.state
+            this.state.value
           );
           break;
         case IND.DOT:
-          indicatorBottom = this.renderDot(statePoint, this.state.value); //.state);
+          indicatorBottom = this.renderDot(statePoint, this.state.value);
           break;
         case IND.POINTER:
           indicatorTop = this.renderPointer(statePoint);
@@ -311,7 +311,7 @@ export class RtRingSvg extends LitElement {
     // render icon to html (not SVG), prioritised by position
     let stateColourValue;
     if (this.colourise_icon) {
-      stateColourValue = this.state.value; //.state;
+      stateColourValue = this.state.value;
     }
     const iconHtml =
       this.middle_element === ME.ICON
@@ -438,9 +438,5 @@ export class RtRingSvg extends LitElement {
       stroke: var(--rt-pointer-colour, orange);
       fill: var(--rt-pointer-colour, orange);
     }
-    // this doesn't work in Safari
-    // .marker.compass {
-    //   filter: drop-shadow(0px 0px 1.5px #00000020);
-    // }
   `;
 }
