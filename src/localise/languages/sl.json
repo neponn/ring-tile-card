@@ -1,0 +1,24 @@
+{
+  "directions": {
+    "north": "Sever",
+    "east": "Vzhod",
+    "south": "Jug",
+    "west": "Zahod",
+    "N": "S",
+    "NNE": "SSV",
+    "NE": "SV",
+    "ENE": "VSV",
+    "E": "V",
+    "ESE": "VJV",
+    "SE": "JV",
+    "SSE": "JJV",
+    "S": "J",
+    "SSW": "JJZ",
+    "SW": "JZ",
+    "WSW": "ZJZ",
+    "W": "Z",
+    "WNW": "ZSZ",
+    "NW": "SZ",
+    "NNW": "SSZ"
+  }
+}

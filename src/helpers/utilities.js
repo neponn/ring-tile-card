@@ -1,3 +1,5 @@
+import { localise } from "../localise/localise";
+
 export function isNumber(n) {
   return !isNaN(parseFloat(n)) && !isNaN(n - 0);
 }
@@ -35,9 +37,6 @@ export function getCoordFromDegrees(angle, radius, viewBox) {
 }
 
 export function degreesToCompass(degrees) {
-  // Normalize the angle to be within 0-360 degrees
-  const normalizedDegrees = ((degrees % 360) + 360) % 360;
-
   // Define the compass points in order
   const compassPoints = [
     "N",
@@ -56,7 +55,10 @@ export function degreesToCompass(degrees) {
     "WNW",
     "NW",
     "NNW",
-  ];
+  ].map((cp) => localise(`directions.${cp}`));
+
+  // Normalize the angle to be within 0-360 degrees
+  const normalizedDegrees = ((degrees % 360) + 360) % 360;
 
   // Calculate the index of the compass point
   const index = Math.round(normalizedDegrees / 22.5) % 16;

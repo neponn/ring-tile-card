@@ -1,0 +1,24 @@
+{
+  "directions": {
+    "north": "Norður",
+    "east": "Austur",
+    "south": "Suður",
+    "west": "Vestur",
+    "N": "N",
+    "NNE": "NNA",
+    "NE": "NA",
+    "ENE": "ANA",
+    "E": "A",
+    "ESE": "ASA",
+    "SE": "SA",
+    "SSE": "SSA",
+    "S": "S",
+    "SSW": "SSV",
+    "SW": "SV",
+    "WSW": "VSV",
+    "W": "V",
+    "WNW": "VNV",
+    "NW": "NV",
+    "NNW": "NNV"
+  }
+}

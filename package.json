@@ -1,6 +1,6 @@
 {
   "name": "ring-tile-card",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A Home Assistant card to visualise your sensor data, based on tile card",
   "author": "neponn",
   "license": "MIT",
