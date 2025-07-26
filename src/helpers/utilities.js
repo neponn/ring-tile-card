@@ -2,6 +2,10 @@ export function isNumber(n) {
   return !isNaN(parseFloat(n)) && !isNaN(n - 0);
 }
 
+export function isDictionary(obj) {
+  return obj !== null && typeof obj === "object" && !Array.isArray(obj);
+}
+
 export function clamp(val, min, max) {
   return val > max ? max : val < min ? min : val;
 }

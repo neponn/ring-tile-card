@@ -11,8 +11,8 @@ This page describes the configuration options and how they work.
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `type` **(required)** | string | | `custom:ring-tile` |
-| `entity` **(required)** | string | | The sensor entity to visualise |
-| `ring_entity` | string | | An optional sensor entity used only to determine the state of the ring, separate from the main `entity` |
+| `entity` **(required)** | [string or dictionary](#specifying-entities-or-entity-attributes) | | The sensor [entity or entity attribute](#specifying-entities-or-entity-attributes) to visualise |
+| `ring_entity` | [string or dictionary](#specifying-entities-or-entity-attributes) | | An optional sensor [entity or entity attribute](#specifying-entities-or-entity-attributes) used only to determine the state of the ring, separate from the main `entity` |
 | `name` | string | | Override the `entity`'s `friendly_name`, if it has one. Used in both the ring and the info area |
 | `icon` | string | | Override the `entity`'s icon, if it has one |
 | `ring_type` | string | `closed` | Specifiy the [type of ring](#ring-type-options): `open`, `closed`, `compass[_n\|_nesw]` or `none` |
@@ -20,12 +20,12 @@ This page describes the configuration options and how they work.
 | `indicator` | string | `arc` | Specify how to [indicate](#indicator-options) the current entity value: `dot`, `arc`, `pointer` or `none` |
 | `ring_only` | boolean | `false` | Enable / disable the info panel to the right of the ring. `true` for `ring_size` ≥ 3 |
 | `scale` | string | `none` | Render a [scale](#scale-options) on the ring (or not): `none`, `ticks`, `ticks_with_labels` |
-| `min` | number or string | 0 | Specify the minimum value indicated on the ring. Can be an absolute number or can be dynamically determined by providing the name of a sensor entity |
-| `max` | number or string | 100 | Specify the maximum value indicated on the ring. Can be an absolute number or can be dynamically determined by providing the name of a sensor entity |
+| `min` | number, [string or dictionary](#specifying-entities-or-entity-attributes) | 0 | Specify the minimum value indicated on the ring. Can be an absolute number or can be dynamically determined by providing the name of a sensor [entity or entity attribute](#specifying-entities-or-entity-attributes) |
+| `max` | number, [string or dictionary](#specifying-entities-or-entity-attributes) | 100 | Specify the maximum value indicated on the ring. Can be an absolute number or can be dynamically determined by providing the name of a sensor [entity or entity attribute](#specifying-entities-or-entity-attributes) |
 | `colour` / `color` | string or dictionary | [see below](#setting-ring-colours) | Specify the [colour of the ring](#setting-ring-colours), either as a single colour, or a dictionary of colours to make a smooth colour gradient. |
 | `colourise_icon` / `colorize_icon` | boolean | `false` | Colour the icon to match the state of the ring |
-| `marker` | number or string | | Specify an optional marker to point to a position on the ring. Can be an absolute number or can be dynamically determined by providing the name of a sensor entity |
-| `marker2` | number or string | | Specify an optional second marker |
+| `marker` | number, [string or dictionary](#specifying-entities-or-entity-attributes) | | Specify an optional marker to point to a position on the ring. Can be an absolute number or can be dynamically determined by providing the name of a sensor [entity or entity attribute](#specifying-entities-or-entity-attributes) |
+| `marker2` | number, [string or dictionary](#specifying-entities-or-entity-attributes) | | Specify an optional second marker |
 | `marker_colour` (or `marker_color`) | string | grey | Specify the colour of the marker. Any valid CSS will do, or a Home Assistant friendly [colour shortcut](#home-assistant-friendly-colour-shortcuts) |
 | `marker2_colour` (or `marker2_color`) | string | light grey | Specify the colour of  marker2 |
 | `top_element` | string | `none` | Specify what to render [inside the ring](#ring-element-options) at the top: `none`, `icon`, `marker`, `marker_with_unit`, `marker_dir`, `unit` |
@@ -286,13 +286,72 @@ As noted above, you can use any CSS colour coding or you can use any of the foll
 
 \* NB: `ha_grey` / `ha_gray` adapts to light / dark mode.
 
+## Specifying entities or entity attributes
+
+When referencing entities for dynamic config options, you may choose one of two formats. Either directly as a string:
+
+```yaml
+entity: sensor.temperature
+```
+
+Or as a dictionary. This second format allows you to provide more information about how the entity should be tracked. For example:
+
+```yaml
+entity:
+  entity: sensor.temperature
+  attribute: signal_strength
+  device_class: signal_strength
+  unit_of_measurement: dBm
+```
+
+In this example, the ring will reflect the state of the `signal_strength` attribute of the `sensor.temperature` entity. A temperature sensor would normally be rendered with °C / °F and ring settings appropriate for a temperature sensor; to give `ring-tile` more information about the attribute you've chosen, you can override the entity's `device_class` and `unit_of_measurement` as shown in the example.
+
+In fact, this can be useful if you have a sensor that lacks a `device_class` or `unit_of_measurement`. For example:
+
+```yaml
+entity:
+  entity: sensor.vanilla_temperature_sensor
+  device_class: temperature
+  unit_of_measurement: °C
+```
+
+Either format can be used with any config option that can be dynamically set to an entity value. Supported config options are:
+
+* `entity`
+* `ring_entity`
+* `marker`
+* `marker2`
+* `min`
+* `max`
+
+Note that `device_class` and `unit_of_measurement` are only relevant to `entity` and `ring_entity`.
+
+Although `ring-tile` card is currently built for `sensor` entities, attribute tracking will work with all entity domains, so long as the attribute is numerical. For example, a thermostat `ring-tile` can be constructed from a `climate` entity.
+
+<img src="img/temperature-scale.png" width="250">
+
+```yaml
+type: custom:ring-tile
+entity:
+  entity: climate.upstairs
+  attribute: current_temperature
+  device_class: temperature
+  unit_of_measurement: °C
+marker:
+  entity: climate.upstairs
+  attribute: temperature
+min: 19
+ring_size: 3
+scale: ticks_with_labels
+```
+
 ## Default handling
 
 As noted above, default settings are matched to the sensor. This makes `ring-tile` easy to use out-of-the-box: often, it's enough to just supply the `entity` name. `ring-tile` examines the [`device_class`](https://www.home-assistant.io/integrations/sensor/#device-class) of your entity, if it has one, to get the right defaults.
 
 Defaults are also adjusted according to the configured `ring-size`. `ring-size: 1` defaults tend to feature just the icon and the ring itself, whereas larger rings can fit more elements.
 
-Not all sensors have a `device_class`. For sensors without one, you may have to do more config. For sensors you make yourself (for example [`template`](https://www.home-assistant.io/integrations/template/) and [`mqtt`](https://www.home-assistant.io/integrations/sensor.mqtt/) sensors), it is a good idea to set an appropriate `device_class`.
+Not all sensors have a `device_class`. For sensors without one, you may have to do more config. For sensors you make yourself (for example [`template`](https://www.home-assistant.io/integrations/template/) and [`mqtt`](https://www.home-assistant.io/integrations/sensor.mqtt/) sensors), it is a good idea to set an appropriate `device_class`. Alternatively, you can supply a `device_class` as part of the entity config as described [earlier](#specifying-entities-or-entity-attributes).
 
 **Important!** You don't have to stick with the default! Whatever configuration you supply always overrides the default value.
 
