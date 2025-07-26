@@ -10,6 +10,18 @@ export function clamp(val, min, max) {
   return val > max ? max : val < min ? min : val;
 }
 
+export function countDecimals(value, maxDecimals = 5) {
+  value = parseFloat(value.toFixed(maxDecimals));
+  if (Math.floor(value) === value) return 0;
+  const str = value.toString();
+  if (str.indexOf(".") === -1) return 0;
+  return str.split(".")[1].length;
+}
+
+export function roundDecimals(value, places) {
+  return parseFloat(parseFloat(value).toFixed(places));
+}
+
 export function deg2rad(angle) {
   return (angle * Math.PI * 2) / 360;
 }
@@ -24,12 +36,26 @@ export function getCoordFromDegrees(angle, radius, viewBox) {
 
 export function degreesToCompass(degrees) {
   // Normalize the angle to be within 0-360 degrees
-  const normalizedDegrees = (degrees % 360 + 360) % 360;
+  const normalizedDegrees = ((degrees % 360) + 360) % 360;
 
   // Define the compass points in order
   const compassPoints = [
-    "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-    "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSW",
+    "SW",
+    "WSW",
+    "W",
+    "WNW",
+    "NW",
+    "NNW",
   ];
 
   // Calculate the index of the compass point
