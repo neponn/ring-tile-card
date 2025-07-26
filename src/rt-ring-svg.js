@@ -8,6 +8,7 @@ import { extendWithRenderMarker } from "./svg/renderMarker.js";
 import { extendWithRenderPointer } from "./svg/renderPointer.js";
 import { extendWithRenderIcon } from "./svg/renderIcon.js";
 import { extendWithRenderText } from "./svg/renderText.js";
+import { extendWithGetRoundedValue } from "./svg/getRoundedValue.js";
 
 import { ColourGradientScale } from "./helpers/ColourGradientScale.js";
 import {
@@ -35,6 +36,7 @@ export class RtRingSvg extends LitElement {
     extendWithRenderIcon(RtRingSvg);
     extendWithRenderDot(RtRingSvg);
     extendWithRenderCompass(RtRingSvg);
+    extendWithGetRoundedValue(RtRingSvg);
   }
 
   static get properties() {
@@ -190,9 +192,11 @@ export class RtRingSvg extends LitElement {
         if (this.ring_type === RT.CLOSED) {
           return nothing;
         }
-        const minText = Math.round(this.min, 0);
+        const minText = this.getRoundedValue(this.min, true);
         const maxText =
-          this.max - this.min < 0.01 ? "–" : Math.round(this.max, 0);
+          this.max - this.min < 0.01
+            ? "–"
+            : this.getRoundedValue(this.max, true);
 
         return svg`
           ${this.renderText(minText, "", POS.MIN)}
@@ -209,7 +213,7 @@ export class RtRingSvg extends LitElement {
         const value = [BE.RING_VALUE, BE.RING_VALUE_UNIT].includes(
           this.bottom_element
         )
-          ? this.value 
+          ? this.value
           : this.display_state.value;
 
         let unit = "";
@@ -315,11 +319,23 @@ export class RtRingSvg extends LitElement {
     }
     const iconHtml =
       this.middle_element === ME.ICON
-        ? this.renderIcon(POS.MIDDLE, this.display_state.stateObj, stateColourValue)
+        ? this.renderIcon(
+            POS.MIDDLE,
+            this.display_state.stateObj,
+            stateColourValue
+          )
         : this.top_element === TE.ICON
-        ? this.renderIcon(POS.TOP, this.display_state.stateObj, stateColourValue)
+        ? this.renderIcon(
+            POS.TOP,
+            this.display_state.stateObj,
+            stateColourValue
+          )
         : this.bottom_element === BE.ICON
-        ? this.renderIcon(POS.BOTTOM, this.display_state.stateObj, stateColourValue)
+        ? this.renderIcon(
+            POS.BOTTOM,
+            this.display_state.stateObj,
+            stateColourValue
+          )
         : nothing;
 
     // render the top, middle and bottom elements

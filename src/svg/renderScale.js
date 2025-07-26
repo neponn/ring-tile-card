@@ -1,6 +1,6 @@
 import { svg, nothing } from "lit";
 import { BE, IND, RT, SCALE, VIEW_BOX } from "../const";
-import { getCoordFromDegrees } from "../helpers/utilities";
+import { countDecimals, getCoordFromDegrees } from "../helpers/utilities";
 
 // Helper function to calculate a "nice" step size
 function calcNiceNum(range, round) {
@@ -163,10 +163,6 @@ export function extendWithRenderScale(RtRingSvg) {
         stroke-width=${1.8 * tickStrokeScale}
         stroke-opacity=${dialOpacity}
       />`;
-    let grandLabels = nothing;
-    if (this.scale === SCALE.TICKS_LABELS) {
-      grandLabels = grand.map(renderLabel);
-    }
 
     const majorSvg = svg`
       <path
@@ -175,14 +171,6 @@ export function extendWithRenderScale(RtRingSvg) {
         stroke-width=${1.2 * tickStrokeScale}
         stroke-opacity=${0.7 * dialOpacity}
       />`;
-    let majorLabels = nothing;
-    if (
-      this.scale === SCALE.TICKS_LABELS &&
-      this.ring_size > 3 &&
-      grandStep / majorStep !== 5
-    ) {
-      majorLabels = major.map(renderLabel);
-    }
 
     const minorSvg = svg`
       <path
@@ -191,6 +179,24 @@ export function extendWithRenderScale(RtRingSvg) {
         stroke-width=${0.6 * tickStrokeScale}
         stroke-opacity=${0.3 * dialOpacity}
       />`;
+
+    // Render labels, if required
+    let svgLabels = nothing;
+    if (this.scale === SCALE.TICKS_LABELS) {
+      let labels = [...grand];
+      if (this.ring_size > 3 && grandStep / majorStep !== 5) {
+        // add major labels
+        labels = [...labels, ...major];
+      }
+      // figure out decimal places needed
+      const places = labels.reduce(
+        (max, value) => Math.max(max, countDecimals(value, this.max_decimals)),
+        0
+      );
+      labels = labels.map((v) => v.toFixed(places));
+
+      svgLabels = labels.map(renderLabel);
+    }
 
     // Combine all SVG elements
     return svg`
@@ -201,8 +207,7 @@ export function extendWithRenderScale(RtRingSvg) {
             ${minorSvg}
           </g>
           <g class="labels">
-            ${majorLabels}        
-            ${grandLabels} 
+            ${svgLabels} 
           </g> 
         </g>
       `;

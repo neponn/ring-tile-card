@@ -62,26 +62,7 @@ export function extendWithRenderText(RtRingSvg) {
     // if value is a number, convert to text and set
     // the correct number of decimal places
     if (isNumber(value) && ![POS.MIN, POS.MAX].includes(position)) {
-      // let decimals;
-      // if (parseInt(value) === 0) {
-      //   decimals = this.min_sig_figs - 1;
-      // } else {
-      let decimals = Math.max(
-        Math.floor(this.min_sig_figs - Math.log10(Math.abs(value))),
-        0
-      );
-
-      // clamp decimals if needed
-      if (decimals > (this.max_decimals ?? 99)) {
-        decimals = this.max_decimals;
-      }
-
-      // Format
-      value = parseFloat(value).toFixed(decimals);
-      // Convert 0.0 to 0 if needed
-      if (parseFloat(value) === 0) {
-        value = "0";
-      }
+      value = this.getRoundedValue(value);
     }
 
     // adjust unit if required
