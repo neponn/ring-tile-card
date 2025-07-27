@@ -208,7 +208,7 @@ export class RingTile extends LitElement {
       small: this._cfg.ring_size === 1,
     };
     const cardClasses = { "transparent-tile": this.transparent_tile };
-    const icon = this._cfg.icon;
+    const icon =this._displayStateObj.attributes["icon"]|| this._cfg.icon;
 
     const renderString = html`
       <ha-card class="active type-tile ${classMap(cardClasses)}">

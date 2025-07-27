@@ -23,8 +23,12 @@ import {
   IND,
 } from "./const.js";
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
+import { extendWithRenderIconSvg } from "./svg/renderIconSvg.js";
 
 export class RtRingSvg extends LitElement {
+  _iconPathCache = {};
+  _iconSvg = nothing;
+
   constructor(...args) {
     super(...args);
 
@@ -34,6 +38,7 @@ export class RtRingSvg extends LitElement {
     extendWithRenderPointer(RtRingSvg);
     extendWithRenderMarker(RtRingSvg);
     extendWithRenderIcon(RtRingSvg);
+    extendWithRenderIconSvg(RtRingSvg);
     extendWithRenderDot(RtRingSvg);
     extendWithRenderCompass(RtRingSvg);
     extendWithGetRoundedValue(RtRingSvg);
@@ -230,6 +235,53 @@ export class RtRingSvg extends LitElement {
     }
   }
 
+  async updated(changedProps) {
+    // Check if icon or relevant state changed
+    if (
+      changedProps.has("icon") ||
+      changedProps.has("display_state") ||
+      changedProps.has("middle_element") ||
+      changedProps.has("top_element") ||
+      changedProps.has("bottom_element")
+    ) {
+      // Only fetch if needed
+      // if (
+      //   this.middle_element === ME.ICON ||
+      //   this.top_element === TE.ICON ||
+      //   this.bottom_element === BE.ICON
+      // ) {
+      let stateColourValue;
+      if (this.colourise_icon) {
+        stateColourValue = this.state.value;
+      }
+      this._iconSvg =
+        this.middle_element === ME.ICON
+          ? await this.renderIconSvg(
+              POS.MIDDLE,
+              this.display_state.stateObj,
+              stateColourValue
+            )
+          : this.top_element === TE.ICON
+          ? await this.renderIconSvg(
+              POS.TOP,
+              this.display_state.stateObj,
+              stateColourValue
+            )
+          : this.bottom_element === BE.ICON
+          ? await this.renderIconSvg(
+              POS.BOTTOM,
+              this.display_state.stateObj,
+              stateColourValue
+            )
+          : nothing;
+
+      this.requestUpdate();
+      // } else {
+      //   this._iconSvg = nothing;
+      // }
+    }
+  }
+
   render() {
     // set up the ring based on config
     this.configureRing();
@@ -317,26 +369,26 @@ export class RtRingSvg extends LitElement {
     if (this.colourise_icon) {
       stateColourValue = this.state.value;
     }
-    const iconHtml =
-      this.middle_element === ME.ICON
-        ? this.renderIcon(
-            POS.MIDDLE,
-            this.display_state.stateObj,
-            stateColourValue
-          )
-        : this.top_element === TE.ICON
-        ? this.renderIcon(
-            POS.TOP,
-            this.display_state.stateObj,
-            stateColourValue
-          )
-        : this.bottom_element === BE.ICON
-        ? this.renderIcon(
-            POS.BOTTOM,
-            this.display_state.stateObj,
-            stateColourValue
-          )
-        : nothing;
+    const iconHtml = nothing;
+    // this.middle_element === ME.ICON
+    //   ? this.renderIcon(
+    //       POS.MIDDLE,
+    //       this.display_state.stateObj,
+    //       stateColourValue
+    //     )
+    //   : this.top_element === TE.ICON
+    //   ? this.renderIcon(
+    //       POS.TOP,
+    //       this.display_state.stateObj,
+    //       stateColourValue
+    //     )
+    //   : this.bottom_element === BE.ICON
+    //   ? this.renderIcon(
+    //       POS.BOTTOM,
+    //       this.display_state.stateObj,
+    //       stateColourValue
+    //     )
+    //   : nothing;
 
     // render the top, middle and bottom elements
     const topElementSvg = this.getTopElementSvg();
@@ -355,6 +407,7 @@ export class RtRingSvg extends LitElement {
       >
         <g class="elements">
           ${topElementSvg} ${middleElementSvg} ${bottomElementSvg}
+          ${this._iconSvg}
         </g>
         <g class="ring">${ringBackground} ${scale}</g>
         <g class="indicators">
