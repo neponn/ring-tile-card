@@ -1,0 +1,24 @@
+{
+  "directions": {
+    "north": "Észak",
+    "east": "Kelet",
+    "south": "Dél",
+    "west": "Nyugat",
+    "N": "É",
+    "NNE": "ÉÉK",
+    "NE": "ÉK",
+    "ENE": "ÉKÉ",
+    "E": "K",
+    "ESE": "KDK",
+    "SE": "DK",
+    "SSE": "DDK",
+    "S": "D",
+    "SSW": "DDNy",
+    "SW": "DNy",
+    "WSW": "NyDNy",
+    "W": "Ny",
+    "WNW": "NyÉNy",
+    "NW": "ÉNy",
+    "NNW": "ÉÉNy"
+  }
+}
