@@ -151,7 +151,7 @@ export class RingTile extends LitElement {
       hass
     );
     this._ringStateObj = this._ringElement.stateObj;
-    const ringValue = this._ringElement.value; 
+    const ringValue = this._ringElement.value;
     this._noState = ["unavailable", "unknown"].includes(ringValue);
 
     this._displayElement = new TrackedObject(this._cfg.entity, hass);
@@ -208,7 +208,10 @@ export class RingTile extends LitElement {
       small: this._cfg.ring_size === 1,
     };
     const cardClasses = { "transparent-tile": this.transparent_tile };
-    const icon =this._displayStateObj.attributes["icon"]|| this._cfg.icon;
+    const icon =
+      this._cfg.icon ||
+      this._displayStateObj.attributes["icon"] ||
+      this._cfg.default_icon;
 
     const renderString = html`
       <ha-card class="active type-tile ${classMap(cardClasses)}">

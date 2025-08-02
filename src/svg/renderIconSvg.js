@@ -58,68 +58,67 @@ export function extendWithRenderIconSvg(RtRingSvg) {
 
     let scale;
     let translateDown;
-    let className;
+    let baseColour = "var(--rt-icon-color, var(--tile-icon-color))";
     switch (position) {
       case POS.TOP:
-        // scale = [0, 0.6, 1, 1.2, 1.8, 2.2][this.ring_size - 1];
-        scale = [0, 0, 0.6, 0.5, 0.47, 0.42][this.ring_size - 1];
-        // translateDown = [0, -43, -42, -45, -40, -40][this.ring_size - 1];
-        translateDown = -25;
+        scale = [0, 0.625, 0.65, 0.566, 0.667, 0.667][this.ring_size - 1];
+        translateDown = -27;
         if (this.indicator === IND.POINTER) {
           translateDown *= 0.75;
         }
         if (this.scale === SCALE.TICKS_LABELS) {
           scale *= 0.95;
+          translateDown *= 0.93;
         }
-        className = "icon top";
+        baseColour = `var(--rt-icon-color, 
+                        color-mix(
+                          in srgb, 
+                          var(--primary-text-color, #212121) 
+                          var(--top-icon-opacity, 50%), 
+                          transparent
+                        )
+                      )`;
         break;
 
       case POS.MIDDLE:
         scale =
           this.ring_size === 1
             ? this.ring_type === RT.NONE
-              ? 1 // TODO fix this?
-              : //   : (this.ring_type === RT.CLOSED ? 0.9 : 0.85) *
-                //     (this._hasMarker && this.indicator === IND.DOT ? 0.9 : 1)
-                // : [2.1, 3.1, 4, 5, 6][this.ring_size - 2];
-                (this.ring_type === RT.CLOSED ? 2.5 : 2.2) *
-                (this._hasMarker && this.indicator ? 0.85 : 1)
-            : [1.5, 1.3, 1.15, 1, 0.9][this.ring_size - 2];
+              ? // no ring so scale up to standard tile icon size
+                2.778
+              : (this.ring_type === RT.CLOSED ? 2.7 : 2.38) *
+                (this._hasMarker && this.indicator ? 0.9 : 1)
+            : // ring_size ≥2
+              [2.2, 2, 1.9, 1.85, 1.8][this.ring_size - 2];
 
-        // translateDown = this.bottom_element === BE.MIN_MAX ? -2 : 0;
-        translateDown = this.bottom_element === BE.MIN_MAX ? -5 : 0;
-        className = "icon middle";
+        translateDown = this.bottom_element === BE.MIN_MAX ? -3 : 0;
         break;
 
       case POS.BOTTOM:
-        // scale = [0.5, 0.9, 1.5, 2, 3, 3.5][this.ring_size - 1];
         scale = [1.4, 1, 0.7, 0.7, 0.7, 0.7][this.ring_size - 1];
-        // translateDown = [25, 40, 38, 40, 35, 35][this.ring_size - 1];
         translateDown = [35, 37, 40, 40, 40, 40][this.ring_size - 1];
         if (this.ring_type === RT.CLOSED) {
-          // TODO fix me
-          translateDown = [5, 25, 26, 27, 23, 24][this.ring_size - 1];
+          translateDown = 22;
         }
-        className = "icon bottom";
         break;
     }
-
-    // const size = MDI_ICON_SIZE * scale;
-    // const translateY = translateDown * scale;
 
     const stateColour = stateColourValue
       ? this._grad.getSolidColour(stateColourValue)
       : "";
 
-    const iconPath = await getIconPath(this.icon, this._iconPathCache, this.hass);
+    const iconPath = await getIconPath(
+      this.icon,
+      this._iconPathCache,
+      this.hass
+    );
 
     const iconTranslate = VIEW_BOX / 2 - (MDI_ICON_SIZE / 2) * scale;
 
     return svg`
       <path 
-        class="primary-path inner-icon" 
         d=${iconPath}
-        fill=${stateColour || "var(--rt-icon-color, var(--tile-icon-color))"}
+        fill=${stateColour || baseColour}
         transform=
           "translate(${iconTranslate}, ${iconTranslate + translateDown})
           scale(${scale}, ${scale})" 

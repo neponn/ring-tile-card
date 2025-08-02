@@ -275,6 +275,8 @@ export class RtRingSvg extends LitElement {
             )
           : nothing;
 
+      if (this._iconSvg) console.log(`icon rendered for ${this.name}`);
+
       this.requestUpdate();
       // } else {
       //   this._iconSvg = nothing;
@@ -365,10 +367,10 @@ export class RtRingSvg extends LitElement {
         : nothing;
 
     // render icon to html (not SVG), prioritised by position
-    let stateColourValue;
-    if (this.colourise_icon) {
-      stateColourValue = this.state.value;
-    }
+    // let stateColourValue;
+    // if (this.colourise_icon) {
+    //   stateColourValue = this.state.value;
+    // }
     const iconHtml = nothing;
     // this.middle_element === ME.ICON
     //   ? this.renderIcon(
@@ -435,13 +437,6 @@ export class RtRingSvg extends LitElement {
       inset: 0;
       overflow: visible;
     }
-    path.primary-path {
-      opacity: var(--icon-primary-opactity, 1);
-    }
-    path.secondary-path {
-      fill: var(--icon-secondary-color, currentcolor);
-      opacity: var(--icon-secondary-opactity, 0.5);
-    }
     text {
       font-family: Geist, var(--ha-font-family-body);
       font-optical-sizing: auto;
@@ -471,25 +466,6 @@ export class RtRingSvg extends LitElement {
     text.top.marker {
       opacity: var(--rt-background-text-opacity, 0.6);
       font-weight: 500;
-    }
-    ha-state-icon.icon.top {
-      color: var(
-        --rt-icon-color,
-        var(
-          --rt-icon-state-color,
-          color-mix(
-            in srgb,
-            var(--primary-text-color, #212121) var(--rt-top-icon-opacity, 50%),
-            transparent
-          )
-        )
-      );
-    }
-    ha-state-icon.icon {
-      color: var(
-        --rt-icon-color,
-        var(--rt-icon-state-color, var(--tile-icon-color))
-      );
     }
     text.compass.cardinal {
       font-weight: 800;
