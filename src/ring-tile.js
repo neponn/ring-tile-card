@@ -426,7 +426,6 @@ export class RingTile extends LitElement {
       inset-inline-end: 3px;
       inset-inline-start: initial;
     }
-    /* ha-tile-info { */
     rt-info {
       position: relative;
       min-width: 0;

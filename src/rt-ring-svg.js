@@ -23,10 +23,9 @@ import {
   IND,
 } from "./const.js";
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
-import { extendWithRenderIconSvg } from "./svg/renderIconSvg.js";
 
 export class RtRingSvg extends LitElement {
-  _iconPathCache = {};
+  _iconSvgCache = {};
   _iconSvg = nothing;
 
   constructor(...args) {
@@ -38,7 +37,6 @@ export class RtRingSvg extends LitElement {
     extendWithRenderPointer(RtRingSvg);
     extendWithRenderMarker(RtRingSvg);
     extendWithRenderIcon(RtRingSvg);
-    extendWithRenderIconSvg(RtRingSvg);
     extendWithRenderDot(RtRingSvg);
     extendWithRenderCompass(RtRingSvg);
     extendWithGetRoundedValue(RtRingSvg);
@@ -125,6 +123,7 @@ export class RtRingSvg extends LitElement {
 
   getTopElementSvg() {
     switch (this.top_element) {
+      // case TE.ICON: handled in async update()
       case TE.MARKER:
         return this.renderText(this.marker_value, "", POS.TOP);
 
@@ -148,6 +147,7 @@ export class RtRingSvg extends LitElement {
 
   getMiddleElementSvg() {
     switch (this.middle_element) {
+      // case ME.ICON: handled in async update()
       case ME.VALUE:
       case ME.VALUE_UNIT:
       case ME.RING_VALUE:
@@ -184,6 +184,7 @@ export class RtRingSvg extends LitElement {
     }
 
     switch (this.bottom_element) {
+      // case BE.ICON: handled in async update()
       case BE.NAME:
         return this.renderText(this.bottom_name, "", POS.BOTTOM);
 
@@ -245,42 +246,32 @@ export class RtRingSvg extends LitElement {
       changedProps.has("bottom_element")
     ) {
       // Only fetch if needed
-      // if (
-      //   this.middle_element === ME.ICON ||
-      //   this.top_element === TE.ICON ||
-      //   this.bottom_element === BE.ICON
-      // ) {
       let stateColourValue;
       if (this.colourise_icon) {
         stateColourValue = this.state.value;
       }
       this._iconSvg =
         this.middle_element === ME.ICON
-          ? await this.renderIconSvg(
+          ? await this.renderIcon(
               POS.MIDDLE,
               this.display_state.stateObj,
               stateColourValue
             )
           : this.top_element === TE.ICON
-          ? await this.renderIconSvg(
+          ? await this.renderIcon(
               POS.TOP,
               this.display_state.stateObj,
               stateColourValue
             )
           : this.bottom_element === BE.ICON
-          ? await this.renderIconSvg(
+          ? await this.renderIcon(
               POS.BOTTOM,
               this.display_state.stateObj,
               stateColourValue
             )
           : nothing;
 
-      if (this._iconSvg) console.log(`icon rendered for ${this.name}`);
-
       this.requestUpdate();
-      // } else {
-      //   this._iconSvg = nothing;
-      // }
     }
   }
 
@@ -366,32 +357,6 @@ export class RtRingSvg extends LitElement {
         ? this.renderMarker(this.marker2_value, this.marker2_colour)
         : nothing;
 
-    // render icon to html (not SVG), prioritised by position
-    // let stateColourValue;
-    // if (this.colourise_icon) {
-    //   stateColourValue = this.state.value;
-    // }
-    const iconHtml = nothing;
-    // this.middle_element === ME.ICON
-    //   ? this.renderIcon(
-    //       POS.MIDDLE,
-    //       this.display_state.stateObj,
-    //       stateColourValue
-    //     )
-    //   : this.top_element === TE.ICON
-    //   ? this.renderIcon(
-    //       POS.TOP,
-    //       this.display_state.stateObj,
-    //       stateColourValue
-    //     )
-    //   : this.bottom_element === BE.ICON
-    //   ? this.renderIcon(
-    //       POS.BOTTOM,
-    //       this.display_state.stateObj,
-    //       stateColourValue
-    //     )
-    //   : nothing;
-
     // render the top, middle and bottom elements
     const topElementSvg = this.getTopElementSvg();
     const middleElementSvg = this.getMiddleElementSvg();
@@ -399,7 +364,6 @@ export class RtRingSvg extends LitElement {
 
     // composite the SVG
     return html`
-      ${iconHtml}
       <svg
         viewBox="0 0 ${VIEW_BOX} ${VIEW_BOX}"
         preserveAspectRatio="xMidYMid meet"
