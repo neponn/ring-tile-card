@@ -1,6 +1,6 @@
 {
   "name": "ring-tile-card",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Home Assistant card to visualise your sensor data, based on tile card",
   "author": "neponn",
   "license": "MIT",
@@ -13,7 +13,8 @@
     "clean": "rm -rf .parcel-cache dist",
     "start": "parcel",
     "build": "parcel build --no-source-maps",
-    "clean-build": "npm run clean && npm run build"
+    "clean-build": "npm run clean && npm run build",
+    "rebuild-deps": "npm run clean && ncu -u && rm -rf node_modules package-lock.json && npm i"
   },
   "type": "module",
   "devDependencies": {
