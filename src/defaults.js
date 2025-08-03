@@ -90,7 +90,7 @@ export const SPECIFIC_DEFAULTS = {
       // all ring sizes
       null: {
         // all measurement units
-        icon: "mdi:thermometer",
+        default_icon: "mdi:thermometer",
         ring_type: RT.OPEN,
         indicator: IND.DOT,
         // middle_element: ME.ICON,
@@ -128,7 +128,7 @@ export const SPECIFIC_DEFAULTS = {
       // all ring sizes
       null: {
         // all measurement units
-        icon: "mdi:weather-partly-cloudy",
+        default_icon: "mdi:weather-partly-cloudy",
         ring_type: RT.OPEN,
         indicator: IND.POINTER,
         scale: SCALE.TICKS,
@@ -180,7 +180,7 @@ export const SPECIFIC_DEFAULTS = {
       // all ring sizes
       null: {
         // all measurement units
-        icon: "mdi:water-percent",
+        default_icon: "mdi:water-percent",
         ring_type: RT.OPEN,
         indicator: IND.DOT,
         max_decimals: 0,
@@ -233,7 +233,7 @@ export const SPECIFIC_DEFAULTS = {
       // all ring sizes
       null: {
         // all measurement units
-        icon: "mdi:weather-windy",
+        default_icon: "mdi:weather-windy",
         ring_type: RT.OPEN,
       },
       kn: {
@@ -277,7 +277,7 @@ export const SPECIFIC_DEFAULTS = {
       // all ring sizes
       null: {
         // all measurement units
-        icon: "mdi:weather-rainy",
+        default_icon: "mdi:weather-rainy",
         ring_type: RT.OPEN,
         colour: HA_COLOURS.ha_blue,
         bottom_element: BE.MIN_MAX,

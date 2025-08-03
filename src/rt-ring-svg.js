@@ -25,6 +25,9 @@ import {
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
 
 export class RtRingSvg extends LitElement {
+  _iconSvgCache = {};
+  _iconSvg = nothing;
+
   constructor(...args) {
     super(...args);
 
@@ -120,6 +123,7 @@ export class RtRingSvg extends LitElement {
 
   getTopElementSvg() {
     switch (this.top_element) {
+      // case TE.ICON: handled in async update()
       case TE.MARKER:
         return this.renderText(this.marker_value, "", POS.TOP);
 
@@ -143,6 +147,7 @@ export class RtRingSvg extends LitElement {
 
   getMiddleElementSvg() {
     switch (this.middle_element) {
+      // case ME.ICON: handled in async update()
       case ME.VALUE:
       case ME.VALUE_UNIT:
       case ME.RING_VALUE:
@@ -179,6 +184,7 @@ export class RtRingSvg extends LitElement {
     }
 
     switch (this.bottom_element) {
+      // case BE.ICON: handled in async update()
       case BE.NAME:
         return this.renderText(this.bottom_name, "", POS.BOTTOM);
 
@@ -227,6 +233,45 @@ export class RtRingSvg extends LitElement {
 
       default:
         return nothing;
+    }
+  }
+
+  async updated(changedProps) {
+    // Check if icon or relevant state changed
+    if (
+      changedProps.has("icon") ||
+      changedProps.has("display_state") ||
+      changedProps.has("middle_element") ||
+      changedProps.has("top_element") ||
+      changedProps.has("bottom_element")
+    ) {
+      // Only fetch if needed
+      let stateColourValue;
+      if (this.colourise_icon) {
+        stateColourValue = this.state.value;
+      }
+      this._iconSvg =
+        this.middle_element === ME.ICON
+          ? await this.renderIcon(
+              POS.MIDDLE,
+              this.display_state.stateObj,
+              stateColourValue
+            )
+          : this.top_element === TE.ICON
+          ? await this.renderIcon(
+              POS.TOP,
+              this.display_state.stateObj,
+              stateColourValue
+            )
+          : this.bottom_element === BE.ICON
+          ? await this.renderIcon(
+              POS.BOTTOM,
+              this.display_state.stateObj,
+              stateColourValue
+            )
+          : nothing;
+
+      this.requestUpdate();
     }
   }
 
@@ -312,32 +357,6 @@ export class RtRingSvg extends LitElement {
         ? this.renderMarker(this.marker2_value, this.marker2_colour)
         : nothing;
 
-    // render icon to html (not SVG), prioritised by position
-    let stateColourValue;
-    if (this.colourise_icon) {
-      stateColourValue = this.state.value;
-    }
-    const iconHtml =
-      this.middle_element === ME.ICON
-        ? this.renderIcon(
-            POS.MIDDLE,
-            this.display_state.stateObj,
-            stateColourValue
-          )
-        : this.top_element === TE.ICON
-        ? this.renderIcon(
-            POS.TOP,
-            this.display_state.stateObj,
-            stateColourValue
-          )
-        : this.bottom_element === BE.ICON
-        ? this.renderIcon(
-            POS.BOTTOM,
-            this.display_state.stateObj,
-            stateColourValue
-          )
-        : nothing;
-
     // render the top, middle and bottom elements
     const topElementSvg = this.getTopElementSvg();
     const middleElementSvg = this.getMiddleElementSvg();
@@ -345,7 +364,6 @@ export class RtRingSvg extends LitElement {
 
     // composite the SVG
     return html`
-      ${iconHtml}
       <svg
         viewBox="0 0 ${VIEW_BOX} ${VIEW_BOX}"
         preserveAspectRatio="xMidYMid meet"
@@ -355,6 +373,7 @@ export class RtRingSvg extends LitElement {
       >
         <g class="elements">
           ${topElementSvg} ${middleElementSvg} ${bottomElementSvg}
+          ${this._iconSvg}
         </g>
         <g class="ring">${ringBackground} ${scale}</g>
         <g class="indicators">
@@ -381,13 +400,6 @@ export class RtRingSvg extends LitElement {
       position: absolute;
       inset: 0;
       overflow: visible;
-    }
-    path.primary-path {
-      opacity: var(--icon-primary-opactity, 1);
-    }
-    path.secondary-path {
-      fill: var(--icon-secondary-color, currentcolor);
-      opacity: var(--icon-secondary-opactity, 0.5);
     }
     text {
       font-family: Geist, var(--ha-font-family-body);
@@ -418,25 +430,6 @@ export class RtRingSvg extends LitElement {
     text.top.marker {
       opacity: var(--rt-background-text-opacity, 0.6);
       font-weight: 500;
-    }
-    ha-state-icon.icon.top {
-      color: var(
-        --rt-icon-color,
-        var(
-          --rt-icon-state-color,
-          color-mix(
-            in srgb,
-            var(--primary-text-color, #212121) var(--rt-top-icon-opacity, 50%),
-            transparent
-          )
-        )
-      );
-    }
-    ha-state-icon.icon {
-      color: var(
-        --rt-icon-color,
-        var(--rt-icon-state-color, var(--tile-icon-color))
-      );
     }
     text.compass.cardinal {
       font-weight: 800;

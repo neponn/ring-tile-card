@@ -1,104 +1,133 @@
-import { ref } from "lit/directives/ref.js";
-import { BE, IND, MDI_ICON_SIZE, POS, RT, SCALE } from "../const";
-import { html } from "lit";
-
-// TODO: Find a way to convert this back to SVG
+import { svg } from "lit";
+import { BE, IND, MDI_ICON_SIZE, POS, RT, SCALE, VIEW_BOX } from "../const";
 
 export function extendWithRenderIcon(RtRingSvg) {
-  RtRingSvg.prototype.renderIcon = function (
+  RtRingSvg.prototype.renderIcon = async function (
     position,
     iconStateObj,
     stateColourValue = undefined
   ) {
+    // Helper to get or extract the SVG path for an icon
+    async function getIconSvg(icon, iconCache, hass) {
+      // Use a unique cache key (icon name, domain, etc.)
+      const cacheKey = `${icon || "def"}`;
+
+      // Return cached path if available
+      if (iconCache[cacheKey]) {
+        return iconCache[cacheKey];
+      }
+
+      // Create off-screen ha-state-icon
+      const offscreen = document.createElement("div");
+      offscreen.style.position = "absolute";
+      offscreen.style.left = "-9999px";
+      document.body.appendChild(offscreen);
+
+      const haIcon = document.createElement("ha-state-icon");
+      haIcon.icon = icon;
+      haIcon.stateObj = iconStateObj;
+      haIcon.hass = hass;
+      offscreen.appendChild(haIcon);
+
+      // Wait for rendering (polling)
+      return new Promise((resolve) => {
+        let attempts = 0;
+        const maxAttempts = 40;
+        const interval = setInterval(() => {
+          const haIconShadow = haIcon.shadowRoot;
+          const haSvgIcon = haIconShadow
+            ?.querySelector("ha-icon")
+            ?.shadowRoot?.querySelector("ha-svg-icon");
+          const svg = haSvgIcon?.shadowRoot?.querySelector("svg");
+          const path = svg?.querySelector("path");
+          if (path) {
+            const vbSize =
+              svg.getAttribute("viewBox").split(" ")[3] || MDI_ICON_SIZE;
+            const d = path.getAttribute("d");
+
+            iconCache[cacheKey] = { d, vbSize }; // Cache the path
+            document.body.removeChild(offscreen); // Clean up
+            clearInterval(interval);
+
+            resolve({ d, vbSize });
+          } else if (attempts >= maxAttempts) {
+            document.body.removeChild(offscreen); // Clean up
+            clearInterval(interval);
+
+            resolve({ d: null, vbSize: null }); // Not found
+          }
+          attempts++;
+        }, 50);
+      });
+    }
+
     let scale;
     let translateDown;
-    let className;
+    let baseColour = "var(--rt-icon-color, var(--tile-icon-color))";
     switch (position) {
       case POS.TOP:
-        scale = [0, 0.6, 1, 1.2, 1.8, 2.2][this.ring_size - 1];
-        translateDown = [0, -43, -42, -45, -40, -40][this.ring_size - 1];
+        scale = [0, 0.625, 0.65, 0.566, 0.667, 0.667][this.ring_size - 1];
+        translateDown = -27;
         if (this.indicator === IND.POINTER) {
           translateDown *= 0.75;
         }
         if (this.scale === SCALE.TICKS_LABELS) {
           scale *= 0.95;
+          translateDown *= 0.93;
         }
-        className = "icon top";
+        baseColour = `var(--rt-icon-color, 
+                        color-mix(
+                          in srgb, 
+                          var(--primary-text-color, #212121) 
+                          var(--top-icon-opacity, 50%), 
+                          transparent
+                        )
+                      )`;
         break;
 
       case POS.MIDDLE:
         scale =
           this.ring_size === 1
             ? this.ring_type === RT.NONE
-              ? 1
-              : (this.ring_type === RT.CLOSED ? 0.9 : 0.85) *
-                (this._hasMarker && this.indicator === IND.DOT ? 0.9 : 1)
-            : [2.1, 3.1, 4, 5, 6][this.ring_size - 2];
-        translateDown = this.bottom_element === BE.MIN_MAX ? -2 : 0;
-        className = "icon middle";
+              ? // no ring so scale up to standard tile icon size
+                2.778
+              : (this.ring_type === RT.CLOSED ? 2.7 : 2.38) *
+                (this._hasMarker && this.indicator ? 0.9 : 1)
+            : // ring_size ≥2
+              [2.2, 2, 1.9, 1.85, 1.8][this.ring_size - 2];
+
+        translateDown = this.bottom_element === BE.MIN_MAX ? -3 : 0;
         break;
 
       case POS.BOTTOM:
-        scale = [0.5, 0.9, 1.5, 2, 3, 3.5][this.ring_size - 1];
-        translateDown = [25, 40, 38, 40, 35, 35][this.ring_size - 1];
+        scale = [1.4, 1, 1, 1, 1, 1][this.ring_size - 1];
+        translateDown = [35, 37, 40, 40, 40, 40][this.ring_size - 1];
         if (this.ring_type === RT.CLOSED) {
-          translateDown = [5, 25, 26, 27, 23, 24][this.ring_size - 1];
+          translateDown = 22;
         }
-        className = "icon bottom";
         break;
     }
 
-    const size = MDI_ICON_SIZE * scale;
-    const translateY = translateDown * scale;
-
-    // Use a `ref` to access the `ha-state-icon` element after rendering
-    const iconRef = (el) => {
-      if (el) {
-        const checkForSvgIcon = () => {
-          const haIcon = el.shadowRoot?.querySelector("ha-icon");
-          const haSvgIcon = haIcon?.shadowRoot?.querySelector("ha-svg-icon");
-          if (haSvgIcon) {
-            // Set the width and height of the ha-svg-icon
-            haSvgIcon.style.width = `${size}px`;
-            haSvgIcon.style.height = `${size}px`;
-            return true; // Element found and updated
-          }
-          return false; // Element not found yet
-        };
-
-        // Poll every 50ms until the element is found or timeout after 2 seconds
-        const maxAttempts = 40;
-        let attempts = 0;
-        const interval = setInterval(() => {
-          if (checkForSvgIcon() || attempts >= maxAttempts) {
-            clearInterval(interval); // Stop polling
-          }
-          attempts++;
-        }, 50);
-      }
-    };
-
     const stateColour = stateColourValue
-      ? `--rt-icon-state-color: ${this._grad.getSolidColour(stateColourValue)};`
+      ? this._grad.getSolidColour(stateColourValue)
       : "";
-    return html`
-      <div
-        style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, calc(-50% + ${translateY}px));
-            ${stateColour}
-          "
-      >
-        <ha-state-icon
-          .icon=${this.icon}
-          .stateObj=${iconStateObj}
-          .hass=${this.hass}
-          class=${className}
-          ${ref(iconRef)}
-        ></ha-state-icon>
-      </div>
-    `;
+
+    const iconSvg = await getIconSvg(
+      this.icon,
+      this._iconSvgCache,
+      this.hass
+    );
+
+    scale *= MDI_ICON_SIZE / parseFloat(iconSvg.vbSize);
+    const iconTranslate = VIEW_BOX / 2 - (iconSvg.vbSize / 2) * scale;
+
+    return svg`
+      <path 
+        d=${iconSvg.d}
+        fill=${stateColour || baseColour}
+        transform=
+          "translate(${iconTranslate}, ${iconTranslate + translateDown})
+          scale(${scale}, ${scale})" 
+      />`;
   };
 }
