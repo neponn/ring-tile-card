@@ -37,6 +37,10 @@ Read how to install and use `ring-tile` card:
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=neponn&repository=ring-tile-card&category=plugin)
 
+### Videos
+
+[Smart-Live](https://www.youtube.com/@smartlivenet) has an [excellent YouTube video](https://www.youtube.com/watch?v=-Su87RrOS38), providing a walkthrough of how to use and configure `ring-tile` card (German).
+
 ## Discussion
 
 If you need help or would like to discuss `ring-tile` card, reach out on the [Home Assistant community forum](https://community.home-assistant.io/t/ring-tile-card-visualise-your-sensor-data/899257). I would love to know how you are using `ring-tile` card - share a few screen shots and YAML config!
