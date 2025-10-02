@@ -1,4 +1,4 @@
-import { IND, ME, RT, SCALE, TE, BE, HA_COLOURS } from "./const";
+import { IND, ME, RT, SCALE, TE, BE, HA_COLOURS, CM } from "./const";
 
 /*
 Default handling for the ring-tile-card, with the following priority:
@@ -78,6 +78,8 @@ export const COMPASS_DEFAULTS = {
   bottom_element: BE.NONE,
   marker_colour: HA_COLOURS.ha_blue,
   marker2_colour: "var(--disabled-text-color, grey)",
+  compass_marker: CM.IN,
+  compass_marker2: CM.IN,
   indicator: IND.NONE,
   ring_size: 2,
 };
