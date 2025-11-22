@@ -147,7 +147,7 @@ export function extendWithRenderIcon(RtRingSvg) {
         break;
 
       case POS.BOTTOM:
-        scale = [1.4, 1, 1, 1, 1, 1][this.ring_size - 1];
+        scale = [1.4, 1, 1, 0.8, 0.8, 0.8][this.ring_size - 1];
         translateDown = [35, 37, 40, 40, 40, 40][this.ring_size - 1];
         if (this.ring_type === RT.CLOSED) {
           translateDown = 22;
