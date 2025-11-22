@@ -1,5 +1,6 @@
 import { svg } from "lit";
 import { BE, IND, MDI_ICON_SIZE, POS, RT, SCALE, VIEW_BOX } from "../const";
+import { isNumber } from "../helpers/utilities";
 
 export function extendWithRenderIcon(RtRingSvg) {
   RtRingSvg.prototype.renderIcon = async function (
@@ -23,9 +24,8 @@ export function extendWithRenderIcon(RtRingSvg) {
       // cache key so changes to that CSS var invalidate the cache.
       let cardModIconVar = "";
       try {
-        cardModIconVar = getComputedStyle(parentScope).getPropertyValue(
-          "--card-mod-icon"
-        );
+        cardModIconVar =
+          getComputedStyle(parentScope).getPropertyValue("--card-mod-icon");
       } catch (e) {
         cardModIconVar = "";
       }
@@ -155,7 +155,7 @@ export function extendWithRenderIcon(RtRingSvg) {
         break;
     }
 
-    const stateColour = stateColourValue
+    const stateColour = isNumber(stateColourValue)
       ? this._grad.getSolidColour(stateColourValue)
       : "";
 
