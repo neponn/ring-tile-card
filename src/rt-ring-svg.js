@@ -200,11 +200,12 @@ export class RtRingSvg extends LitElement {
         if (this.ring_type === RT.CLOSED) {
           return nothing;
         }
-        const minText = this.getRoundedValue(this.min, true);
+        const maxDecimals = this.ring_size < 4 ? 0 : 99;
+        const minText = this.getRoundedValue(this.min, true, maxDecimals);
         const maxText =
           this.max - this.min < 0.01
             ? "–"
-            : this.getRoundedValue(this.max, true);
+            : this.getRoundedValue(this.max, true, maxDecimals);
 
         return svg`
           ${this.renderText(minText, "", POS.MIN)}

@@ -1,7 +1,11 @@
 import { countDecimals } from "../helpers/utilities";
 
 export function extendWithGetRoundedValue(RtRingSvg) {
-  RtRingSvg.prototype.getRoundedValue = function (value, trim = false) {
+  RtRingSvg.prototype.getRoundedValue = function (
+    value,
+    trim = false,
+    maxDecimals = 99
+  ) {
     let decimals = Math.max(
       Math.floor(this.min_sig_figs - Math.log10(Math.abs(value))),
       0
@@ -10,6 +14,9 @@ export function extendWithGetRoundedValue(RtRingSvg) {
     // clamp decimals if needed
     if (decimals > (this.max_decimals ?? 99)) {
       decimals = this.max_decimals;
+    }
+    if (decimals > maxDecimals) {
+      decimals = maxDecimals;
     }
 
     // Format
