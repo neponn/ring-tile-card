@@ -247,8 +247,10 @@ export class RingTile extends LitElement {
                 .display_state=${this._displayElement}
                 .marker_value=${this._markerValue}
                 .marker_colour=${this._cfg.marker_colour}
+                .compass_marker=${this._cfg.compass_marker}
                 .marker2_value=${this._marker2Value}
                 .marker2_colour=${this._cfg.marker2_colour}
+                .compass_marker2=${this._cfg.compass_marker2}
                 .icon=${icon}
                 .colourise_icon=${this._cfg.colourise_icon}
                 .top_element=${this._cfg.top_element}

@@ -53,8 +53,10 @@ export class RtRingSvg extends LitElement {
       display_state: { attribute: false },
       marker_value: { attribute: false },
       marker_colour: { attribute: false },
+      compass_marker: { attribute: false },
       marker2_value: { attribute: false },
       marker2_colour: { attribute: false },
+      compass_marker2: { attribute: false },
       min: { attribute: false },
       max: { attribute: false },
       icon: { attribute: false },
@@ -350,11 +352,19 @@ export class RtRingSvg extends LitElement {
     // render the markers
     const marker =
       isNumber(this.marker_value) && !this._noState
-        ? this.renderMarker(this.marker_value, this.marker_colour)
+        ? this.renderMarker(
+            this.marker_value,
+            this.marker_colour,
+            this.compass_marker
+          )
         : nothing;
     const marker2 =
       isNumber(this.marker2_value) && !this._noState
-        ? this.renderMarker(this.marker2_value, this.marker2_colour)
+        ? this.renderMarker(
+            this.marker2_value,
+            this.marker2_colour,
+            this.compass_marker2
+          )
         : nothing;
 
     // render the top, middle and bottom elements

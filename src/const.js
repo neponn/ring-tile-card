@@ -10,8 +10,10 @@ export const HA_COLOURS = {
   ha_green: "rgb(81,140,67)", // hsl(108, 35%, 41%)
   ha_blue: "rgb(68,115,158)", // hsl(209, 40%, 44%)
   ha_purple: "rgb(146,107,199)", // hsl(265, 45%, 60%)
-  ha_grey: "color-mix(in srgb, var(--primary-text-color, #212121) 50%, transparent)",
-  ha_gray: "color-mix(in srgb, var(--primary-text-color, #212121) 50%, transparent)",
+  ha_grey:
+    "color-mix(in srgb, var(--primary-text-color, #212121) 50%, transparent)",
+  ha_gray:
+    "color-mix(in srgb, var(--primary-text-color, #212121) 50%, transparent)",
 };
 
 export var mdiExclamationThick = "M10 3H14V14H10V3M10 21V17H14V21H10Z";
@@ -30,6 +32,12 @@ export const IND = {
   ARC: "arc",
   POINTER: "pointer",
   NONE: "none",
+};
+
+export const CM = {
+  IN: "arrow_in",
+  OUT: "arrow_out",
+  DOT: "dot",
 };
 
 export const SCALE = {

@@ -28,6 +28,8 @@ This page describes the configuration options and how they work.
 | `marker2` | number, [string or dictionary](#specifying-entities-or-entity-attributes) | | Specify an optional second marker |
 | `marker_colour` (or `marker_color`) | string | grey | Specify the colour of the marker. Any valid CSS will do, or a Home Assistant friendly [colour shortcut](#home-assistant-friendly-colour-shortcuts) |
 | `marker2_colour` (or `marker2_color`) | string | light grey | Specify the colour of  marker2 |
+| `compass_marker` | string | `arrow_in` | For `compass` rings, the marker can be configured to point inwards (`arrow_in`), outwards (`arrow_out`), or can just be a dot (`dot`) |
+| `compass_marker2` | string | `arrow_in` | For `compass` rings, configure `marker2` appearance |
 | `top_element` | string | `none` | Specify what to render [inside the ring](#ring-element-options) at the top: `none`, `icon`, `marker`, `marker_with_unit`, `marker_dir`, `unit` |
 | `middle_element` | string | `icon` | Specify what to render [inside the ring](#ring-element-options) in the middle: `none`, `name`, `icon`, `value`, `value_with_unit`, `ring_value`, `ring_value_with_unit` |
 | `bottom_element` | string | `none` | Specify what to render [inside the ring](#ring-element-options) at the bottom: `none`, `name`, `icon`, `min_max`, `unit`, `ring_unit`, `value`, `value_with_unit`, `ring_value`, `ring_value_with_unit` |
