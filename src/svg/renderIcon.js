@@ -7,27 +7,70 @@ export function extendWithRenderIcon(RtRingSvg) {
     iconStateObj,
     stateColourValue = undefined
   ) {
-    // Helper to get or extract the SVG path for an icon
-    async function getIconSvg(icon, iconCache, hass) {
-      // Use a unique cache key (icon name, domain, etc.)
-      const cacheKey = `${icon || "def"}`;
+    // Helper to extract the SVG path for an icon.
+    async function getIconSvg(icon, hass) {
+      // Determine the scope where card-mod might set CSS variables.
+      const parentScope =
+        this.closest("rt-ring") ||
+        (this.getRootNode &&
+          this.getRootNode().host &&
+          this.getRootNode().host.closest &&
+          this.getRootNode().host.closest("rt-ring")) ||
+        (this.getRootNode && this.getRootNode().host) ||
+        document.body;
 
-      // Return cached path if available
-      if (iconCache[cacheKey]) {
-        return iconCache[cacheKey];
+      // Read the card-mod icon variable (if present) and include it in the
+      // cache key so changes to that CSS var invalidate the cache.
+      let cardModIconVar = "";
+      try {
+        cardModIconVar = getComputedStyle(parentScope).getPropertyValue(
+          "--card-mod-icon"
+        );
+      } catch (e) {
+        cardModIconVar = "";
       }
 
-      // Create off-screen ha-state-icon
-      const offscreen = document.createElement("div");
-      offscreen.style.position = "absolute";
-      offscreen.style.left = "-9999px";
-      document.body.appendChild(offscreen);
+      const cacheKey = `${icon || "def"}|${(cardModIconVar || "").trim()}`;
 
-      const haIcon = document.createElement("ha-state-icon");
+      // Ensure cache object exists on the instance
+      if (!this._iconSvgCache) {
+        this._iconSvgCache = {};
+      }
+
+      // Return cached path if available for this icon + card-mod var
+      if (this._iconSvgCache[cacheKey]) {
+        return this._iconSvgCache[cacheKey];
+      }
+      // Create a persistent hidden container on the instance to host
+      // the off-screen `ha-state-icon`. This container is preserved
+      // instead of being removed so that runtime CSS updates affect it.
+      if (!this._rt_offscreen_container) {
+        const offscreen = document.createElement("div");
+        offscreen.style.position = "absolute";
+        offscreen.style.left = "-9999px";
+        offscreen.style.top = "-9999px";
+        offscreen.style.width = "1px";
+        offscreen.style.height = "1px";
+        offscreen.style.overflow = "hidden";
+        offscreen.style.pointerEvents = "none";
+        // Append into the previously-determined parentScope so card-mod
+        // variables apply.
+        parentScope.appendChild(offscreen);
+        this._rt_offscreen_container = offscreen;
+      }
+
+      if (!this._rt_ha_state_icon) {
+        const haIconEl = document.createElement("ha-state-icon");
+        this._rt_offscreen_container.appendChild(haIconEl);
+        this._rt_ha_state_icon = haIconEl;
+      }
+
+      const haIcon = this._rt_ha_state_icon;
+
+      // Update the off-screen element with the requested icon/state
       haIcon.icon = icon;
       haIcon.stateObj = iconStateObj;
       haIcon.hass = hass;
-      offscreen.appendChild(haIcon);
 
       // Wait for rendering (polling)
       return new Promise((resolve) => {
@@ -42,18 +85,22 @@ export function extendWithRenderIcon(RtRingSvg) {
           const path = svg?.querySelector("path");
           if (path) {
             const vbSize =
-              svg.getAttribute("viewBox").split(" ")[3] || MDI_ICON_SIZE;
+              svg.getAttribute("viewBox")?.split(" ")[3] || MDI_ICON_SIZE;
             const d = path.getAttribute("d");
 
-            iconCache[cacheKey] = { d, vbSize }; // Cache the path
-            document.body.removeChild(offscreen); // Clean up
-            clearInterval(interval);
+            // Cache the result for this icon + card-mod state so we don't
+            // repeatedly re-extract while the values are unchanged.
+            const res = { d, vbSize };
+            try {
+              this._iconSvgCache[cacheKey] = res;
+            } catch (e) {
+              // ignore caching errors
+            }
 
-            resolve({ d, vbSize });
+            clearInterval(interval);
+            resolve(res);
           } else if (attempts >= maxAttempts) {
-            document.body.removeChild(offscreen); // Clean up
             clearInterval(interval);
-
             resolve({ d: null, vbSize: null }); // Not found
           }
           attempts++;
@@ -112,11 +159,7 @@ export function extendWithRenderIcon(RtRingSvg) {
       ? this._grad.getSolidColour(stateColourValue)
       : "";
 
-    const iconSvg = await getIconSvg(
-      this.icon,
-      this._iconSvgCache,
-      this.hass
-    );
+    const iconSvg = await getIconSvg.call(this, this.icon, this.hass);
 
     scale *= MDI_ICON_SIZE / parseFloat(iconSvg.vbSize);
     const iconTranslate = VIEW_BOX / 2 - (iconSvg.vbSize / 2) * scale;
