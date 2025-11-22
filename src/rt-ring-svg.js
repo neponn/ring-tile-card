@@ -222,7 +222,7 @@ export class RtRingSvg extends LitElement {
         const value = [BE.RING_VALUE, BE.RING_VALUE_UNIT].includes(
           this.bottom_element
         )
-          ? this.value
+          ? this.state.value
           : this.display_state.value;
 
         let unit = "";
