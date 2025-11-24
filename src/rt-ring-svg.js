@@ -200,12 +200,31 @@ export class RtRingSvg extends LitElement {
         if (this.ring_type === RT.CLOSED) {
           return nothing;
         }
-        const maxDecimals = this.ring_size < 4 ? 0 : 99;
-        const minText = this.getRoundedValue(this.min, true, maxDecimals);
-        const maxText =
-          this.max - this.min < 0.01
-            ? "–"
-            : this.getRoundedValue(this.max, true, maxDecimals);
+
+        // try to avoid min and max tangling by reducing number of decimal
+        // places if it helps
+        let minText;
+        let maxText;
+        let trimDecimals = 0;
+        do {
+          minText = this.getRoundedValue(
+            this.min,
+            true,
+            this.max_decimals - trimDecimals
+          );
+          maxText =
+            this.max - this.min < 0.01
+              ? "–"
+              : this.getRoundedValue(
+                  this.max,
+                  true,
+                  this.max_decimals - trimDecimals
+                );
+        } while (
+          minText.length + maxText.length >
+            [5, 5, 7, 8, 9, 11][this.ring_size - 1] &&
+          trimDecimals++ < this.max_decimals
+        );
 
         return svg`
           ${this.renderText(minText, "", POS.MIN)}

@@ -12,12 +12,25 @@ export function clamp(val, min, max) {
   return val > max ? max : val < min ? min : val;
 }
 
+export function getDecimalSeparator(locale) {
+  const parts = new Intl.NumberFormat(locale).formatToParts(1.1);
+  const dec = parts.find((p) => p.type === "decimal");
+  return dec ? dec.value : ".";
+}
+
+export function toLocaleFixed(value, decimals) {
+  const fixedValue = parseFloat(value).toFixed(decimals);
+  const dp = getDecimalSeparator();
+  return fixedValue.replace(".", dp);
+}
+
 export function countDecimals(value, maxDecimals = 5) {
+  const dp = ".";
   value = parseFloat(value.toFixed(maxDecimals));
   if (Math.floor(value) === value) return 0;
   const str = value.toString();
-  if (str.indexOf(".") === -1) return 0;
-  return str.split(".")[1].length;
+  if (str.indexOf(dp) === -1) return 0;
+  return str.split(dp)[1].length;
 }
 
 export function roundDecimals(value, places) {

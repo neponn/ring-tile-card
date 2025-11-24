@@ -1,4 +1,4 @@
-import { countDecimals } from "../helpers/utilities";
+import { countDecimals, toLocaleFixed } from "../helpers/utilities";
 
 export function extendWithGetRoundedValue(RtRingSvg) {
   RtRingSvg.prototype.getRoundedValue = function (
@@ -19,18 +19,25 @@ export function extendWithGetRoundedValue(RtRingSvg) {
       decimals = maxDecimals;
     }
 
-    // Format
-    value = parseFloat(value).toFixed(decimals);
+    // ensure numeric
+    const num = parseFloat(value);
+    if (!isFinite(num)) {
+      return String(value);
+    }
 
+    // treat exact zero consistently
+    if (num === 0) {
+      return "0";
+    }
+
+    // trim if needed
     if (trim) {
-      value = parseFloat(value);
-      value = value.toFixed(countDecimals(value));
+      decimals = Math.min(countDecimals(num), maxDecimals);
     }
-    // Convert 0.0 to 0 if needed
-    if (parseFloat(value) === 0) {
-      value = "0";
-    }
+    
+    // Format using locale-aware formatting (respecting '.' or ',' as needed)
+    const formatted = toLocaleFixed(value, decimals);
 
-    return value;
+    return formatted;
   };
 }
