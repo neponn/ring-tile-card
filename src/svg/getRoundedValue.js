@@ -1,4 +1,5 @@
-import { countDecimals, toLocaleFixed } from "../helpers/utilities";
+import { countDecimals } from "../helpers/utilities";
+import { toLocaleFixed } from "../localise/maths";
 
 export function extendWithGetRoundedValue(RtRingSvg) {
   RtRingSvg.prototype.getRoundedValue = function (
@@ -32,7 +33,7 @@ export function extendWithGetRoundedValue(RtRingSvg) {
 
     // trim if needed
     if (trim) {
-      decimals = Math.min(countDecimals(num), maxDecimals);
+      decimals = Math.min(decimals, countDecimals(num), maxDecimals);
     }
     
     // Format using locale-aware formatting (respecting '.' or ',' as needed)

@@ -1,11 +1,7 @@
 import { svg, nothing } from "lit";
 import { BE, IND, RT, SCALE, VIEW_BOX } from "../const";
-import {
-  countDecimals,
-  getCoordFromDegrees,
-  getDecimalSeparator,
-  toLocaleFixed,
-} from "../helpers/utilities";
+import { countDecimals, getCoordFromDegrees } from "../helpers/utilities";
+import { getDecimalSeparator } from "../localise/maths";
 
 // Helper function to calculate a "nice" step size
 function calcNiceNum(range, round) {

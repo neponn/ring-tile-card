@@ -1,6 +1,7 @@
 import { svg, nothing } from "lit";
-import { clamp, getDecimalSeparator, isNumber } from "../helpers/utilities";
+import { clamp, isNumber } from "../helpers/utilities";
 import { MID_BOX, POS, RT, SCALE } from "../const";
+import { getDecimalSeparator } from "../localise/maths";
 
 // export function renderText(cfg, value, unit, position) {
 export function extendWithRenderText(RtRingSvg) {
