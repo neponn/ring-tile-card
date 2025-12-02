@@ -110,8 +110,8 @@ export class RtRingSvg extends LitElement {
     const scaleDef = {
       minValue: this.min,
       maxValue: this.max,
-      gradStart: (100.0 * this.startDegrees) / 360,
-      gradEnd: (100.0 * this.endDegrees) / 360,
+      gradStart: (100.0 * this._startDegrees) / 360,
+      gradEnd: (100.0 * this._endDegrees) / 360,
     };
     this._grad = new ColourGradientScale(this.colour, scaleDef);
     this.marker_colour = HA_COLOURS[this.marker_colour] || this.marker_colour;
