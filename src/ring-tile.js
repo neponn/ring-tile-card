@@ -20,7 +20,7 @@ export class RingTile extends LitElement {
   static get properties() {
     return {
       _hass: { attribute: false },
-      _cfg: { state: true },
+      _config: { state: true },
 
       _ringStateObj: { state: true },
       _displayStateObj: { state: true },
@@ -39,7 +39,7 @@ export class RingTile extends LitElement {
     let defaults = { ...DEFAULTS };
 
     // Apply extra defaults for medium rings
-    if (this._cfg.ring_size && this._cfg.ring_size === 2) {
+    if (this._config.ring_size && this._config.ring_size === 2) {
       defaults = {
         ...defaults,
         ...MEDIUM_DEFAULTS,
@@ -47,7 +47,7 @@ export class RingTile extends LitElement {
     }
 
     // Apply extra defaults for large rings
-    if (this._cfg.ring_size && this._cfg.ring_size > 2) {
+    if (this._config.ring_size && this._config.ring_size > 2) {
       defaults = {
         ...defaults,
         ...LARGE_DEFAULTS,
@@ -60,7 +60,7 @@ export class RingTile extends LitElement {
     const deviceClass = this._ringElement.deviceClass;
     const measurementUnit = this._ringElement.unitOfMeasurement;
     const isCompass =
-      this._cfg.ring_type && this._cfg.ring_type.startsWith(RT.COMPASS);
+      this._config.ring_type && this._config.ring_type.startsWith(RT.COMPASS);
 
     // Special case for the compass
     if (isCompass) {
@@ -72,11 +72,11 @@ export class RingTile extends LitElement {
       // start applying specific defaults
       const dcDefaults = SPECIFIC_DEFAULTS[deviceClass];
       if (dcDefaults) {
-        const ringSize = !this._cfg.ring_size
+        const ringSize = !this._config.ring_size
           ? "small"
-          : this._cfg.ring_size === 1
+          : this._config.ring_size === 1
           ? "small"
-          : this._cfg.ring_size === 2
+          : this._config.ring_size === 2
           ? "medium"
           : "large";
 
@@ -105,25 +105,25 @@ export class RingTile extends LitElement {
 
     // handle US spellings
     US_SPELLINGS.forEach((correction) => {
-      if (correction.US in this._cfg) {
-        this._cfg[correction.AU] = this._cfg[correction.US];
+      if (correction.US in this._config) {
+        this._config[correction.AU] = this._config[correction.US];
       }
     });
 
     // Apply the found defaults to the config, with provided config taking precedence
-    this._cfg = {
+    this._config = {
       ...defaults,
-      ...this._cfg,
+      ...this._config,
     };
 
     // Process remaining config
-    this._cfg.ring_size = clamp(this._cfg.ring_size || 1, 1, 6);
+    this._config.ring_size = clamp(this._config.ring_size || 1, 1, 6);
 
     this._name =
-      this._cfg.name || this._displayStateObj.attributes["friendly_name"];
-    this._cfg.bottom_name = this._cfg.bottom_name || this._name;
+      this._config.name || this._displayStateObj.attributes["friendly_name"];
+    this._config.bottom_name = this._config.bottom_name || this._name;
 
-    this._cfg.ring_only = this._cfg.ring_only || this._cfg.ring_size >= 3;
+    this._config.ring_only = this._config.ring_only || this._config.ring_size >= 3;
 
     this._configProcessed = true;
   }
@@ -136,7 +136,7 @@ export class RingTile extends LitElement {
       throw new Error("You must define an entity");
     }
 
-    this._cfg = { ...config };
+    this._config = { ...config };
 
     if (this._hass) {
       this.hass = this._hass;
@@ -147,36 +147,36 @@ export class RingTile extends LitElement {
     this._hass = hass;
 
     this._ringElement = new TrackedObject(
-      this._cfg.ring_entity || this._cfg.entity,
+      this._config.ring_entity || this._config.entity,
       hass
     );
     this._ringStateObj = this._ringElement.stateObj;
     const ringValue = this._ringElement.value;
     this._noState = ["unavailable", "unknown"].includes(ringValue);
 
-    this._displayElement = new TrackedObject(this._cfg.entity, hass);
+    this._displayElement = new TrackedObject(this._config.entity, hass);
     this._displayStateObj = this._displayElement.stateObj;
 
     if (this._ringStateObj && !this._configProcessed) {
       this.processConfig();
     }
 
-    if (this._cfg.marker != null) {
-      this._markerElement = new TrackedObject(this._cfg.marker, this._hass);
+    if (this._config.marker != null) {
+      this._markerElement = new TrackedObject(this._config.marker, this._hass);
       this._markerValue = parseFloat(this._markerElement.value);
     }
 
-    if (this._cfg.marker2 != null) {
-      this._marker2Element = new TrackedObject(this._cfg.marker2, this._hass);
+    if (this._config.marker2 != null) {
+      this._marker2Element = new TrackedObject(this._config.marker2, this._hass);
       this._marker2Value = parseFloat(this._marker2Element.value);
     }
 
-    if (this._cfg.min != null) {
-      this._minElement = new TrackedObject(this._cfg.min, this._hass);
+    if (this._config.min != null) {
+      this._minElement = new TrackedObject(this._config.min, this._hass);
       this._minValue = parseFloat(this._minElement.value);
     }
-    if (this._cfg.max != null) {
-      this._maxElement = new TrackedObject(this._cfg.max, this._hass);
+    if (this._config.max != null) {
+      this._maxElement = new TrackedObject(this._config.max, this._hass);
       this._maxValue = parseFloat(this._maxElement.value);
     }
     // Handle the case that min == max to avoid annoying edge cases
@@ -190,7 +190,7 @@ export class RingTile extends LitElement {
       ? parseFloat(this._ringElement.value)
       : "unavailable";
 
-    const stateDisplay = this._cfg.hide_state
+    const stateDisplay = this._config.hide_state
       ? nothing
       : html`
           <state-display
@@ -200,24 +200,24 @@ export class RingTile extends LitElement {
           ></state-display>
         `;
 
-    const ringPixels = [36, 96, 154, 212, 270, 330][this._cfg.ring_size - 1];
+    const ringPixels = [36, 96, 154, 212, 270, 330][this._config.ring_size - 1];
     const contentClasses = {
       vertical: false,
-      centred: this._cfg.ring_only || this._cfg.ring_size >= 3,
-      large: this._cfg.ring_size > 1,
-      small: this._cfg.ring_size === 1,
+      centred: this._config.ring_only || this._config.ring_size >= 3,
+      large: this._config.ring_size > 1,
+      small: this._config.ring_size === 1,
     };
     const cardClasses = { "transparent-tile": this.transparent_tile };
     const icon =
-      this._cfg.icon ||
+      this._config.icon ||
       this._displayStateObj.attributes["icon"] ||
-      this._cfg.default_icon;
+      this._config.default_icon;
 
     const renderString = html`
       <ha-card class="active type-tile ${classMap(cardClasses)}">
         <div
           class="background"
-          @click=${(ev) => this._handleAction(ev, this._cfg.tap_action)}
+          @click=${(ev) => this._handleAction(ev, this._config.tap_action)}
           role=${ifDefined(this._hasCardAction ? "button" : undefined)}
           tabindex=${ifDefined(this._hasCardAction ? "0" : undefined)}
           aria-labelledby="info"
@@ -231,35 +231,37 @@ export class RingTile extends LitElement {
               tabindex=${ifDefined(this._hasIconAction ? "0" : undefined)}
               data-domain="sensor"
               data-state=${stateStr}
-              ring_size=${this._cfg.ring_size}
+              ring_size=${this._config.ring_size}
               @click=${(ev) =>
-                this._handleAction(ev, this._cfg.icon_tap_action)}
+                this._handleAction(ev, this._config.icon_tap_action)}
             >
               <rt-ring-svg
                 style="width:${ringPixels}px;height:${ringPixels}px;"
                 slot="icon"
-                ring_type=${this._cfg.ring_type}
-                ring_size=${this._cfg.ring_size}
-                indicator=${this._cfg.indicator}
-                scale=${this._cfg.scale}
-                .colour=${this._cfg.colour}
+                ring_type=${this._config.ring_type}
+                ring_size=${this._config.ring_size}
+                indicator=${this._config.indicator}
+                scale=${this._config.scale}
+                .colour=${this._config.colour}
                 .state=${this._ringElement}
                 .display_state=${this._displayElement}
                 .marker_value=${this._markerValue}
-                .marker_colour=${this._cfg.marker_colour}
+                .marker_colour=${this._config.marker_colour}
+                .compass_marker=${this._config.compass_marker}
                 .marker2_value=${this._marker2Value}
-                .marker2_colour=${this._cfg.marker2_colour}
+                .marker2_colour=${this._config.marker2_colour}
+                .compass_marker2=${this._config.compass_marker2}
                 .icon=${icon}
-                .colourise_icon=${this._cfg.colourise_icon}
-                .top_element=${this._cfg.top_element}
-                .middle_element=${this._cfg.middle_element}
-                .bottom_element=${this._cfg.bottom_element}
-                .bottom_name=${this._cfg.bottom_name}
+                .colourise_icon=${this._config.colourise_icon}
+                .top_element=${this._config.top_element}
+                .middle_element=${this._config.middle_element}
+                .bottom_element=${this._config.bottom_element}
+                .bottom_name=${this._config.bottom_name}
                 .name=${this._name}
                 .min=${this._minValue}
                 .max=${this._maxValue}
-                .min_sig_figs=${this._cfg.min_sig_figs}
-                .max_decimals=${this._cfg.max_decimals}
+                .min_sig_figs=${this._config.min_sig_figs}
+                .max_decimals=${this._config.max_decimals}
                 .hass=${this._hass}
               ></rt-ring-svg>
               ${this._noState
@@ -270,14 +272,14 @@ export class RingTile extends LitElement {
                   </ha-tile-badge>`
                 : nothing}
             </rt-ring>
-            ${this._cfg.ring_only || this._cfg.ring_size >= 3
+            ${this._config.ring_only || this._config.ring_size >= 3
               ? nothing
               : html` <rt-info
                   id="info"
                   .primary=${this._name}
                   .secondary=${stateDisplay}
-                  .large_ring=${this._cfg.ring_size > 1}
-                  large_secondary=${this._cfg.large_secondary}
+                  .large_ring=${this._config.ring_size > 1}
+                  large_secondary=${this._config.large_secondary}
                 ></rt-info>`}
           </div>
         </div>
@@ -309,14 +311,14 @@ export class RingTile extends LitElement {
 
   getGridOptions() {
     let columns = 6;
-    if (this._cfg.ring_only) {
-      if (this._cfg.transparent_tile) {
+    if (this._config.ring_only) {
+      if (this._config.transparent_tile) {
         columns = 1.6;
       } else {
-        columns = 2 * this._cfg.ring_size;
+        columns = 2 * this._config.ring_size;
       }
     }
-    const rows = this._cfg.ring_size;
+    const rows = this._config.ring_size;
     return {
       columns,
       rows: rows,
@@ -472,7 +474,7 @@ export class RingTile extends LitElement {
     if (!actionConfig || !actionConfig.action) return;
 
     const entityId =
-      actionConfig.tapped === "icon" && this._cfg.ring_entity
+      actionConfig.tapped === "icon" && this._config.ring_entity
         ? this._ringElement.entityName
         : this._displayElement.entityName;
 
@@ -520,11 +522,11 @@ export class RingTile extends LitElement {
   }
 
   _hasCardAction() {
-    return this._cfg.tap_action && this._cfg.tap_action.action !== "none";
+    return this._config.tap_action && this._config.tap_action.action !== "none";
   }
   _hasIconAction() {
     return (
-      this._cfg.icon_tap_action && this._cfg.icon_tap_action.action !== "none"
+      this._config.icon_tap_action && this._config.icon_tap_action.action !== "none"
     );
   }
 }

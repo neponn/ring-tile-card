@@ -13,11 +13,12 @@ export function clamp(val, min, max) {
 }
 
 export function countDecimals(value, maxDecimals = 5) {
+  const dp = ".";
   value = parseFloat(value.toFixed(maxDecimals));
   if (Math.floor(value) === value) return 0;
   const str = value.toString();
-  if (str.indexOf(".") === -1) return 0;
-  return str.split(".")[1].length;
+  if (str.indexOf(dp) === -1) return 0;
+  return str.split(dp)[1].length;
 }
 
 export function roundDecimals(value, places) {

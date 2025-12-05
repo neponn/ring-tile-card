@@ -5,8 +5,11 @@ import { RtRing } from "./rt-ring";
 import { RtRingSvg } from "./rt-ring-svg";
 import * as pkg from "../package.json";
 
+const buildNumber = process.env.BUILD_NUMBER || '?';
+const infoText = `v${pkg.version}   #${buildNumber}`;
+
 console.info(
-  `%c ring-tile-card %c v${pkg.version} `,
+  `%c ring-tile-card %c ${infoText} `,
   'color: yellow; font-weight: bold; background: darkblue',
   'color: white; font-weight: bold; background: dimgray',
 );

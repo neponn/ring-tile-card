@@ -1,23 +1,35 @@
 import { svg } from "lit";
-import { IND, MID_BOX, RT, VIEW_BOX } from "../const";
+import { CM, IND, MID_BOX, RT, VIEW_BOX } from "../const";
 import { clamp, deg2rad, getCoordFromDegrees } from "../helpers/utilities";
 
 export function extendWithRenderMarker(RtRingSvg) {
-  RtRingSvg.prototype.renderMarker = function (markerValue, markerColour) {
+  RtRingSvg.prototype.renderMarker = function (
+    markerValue,
+    markerColour,
+    compassMarker
+  ) {
     const width = this._ringWidth;
 
+    // set up config
     let degrees;
     let markerWidth;
     let strokeWidth;
     let className = "marker";
 
     if (this.ring_type.startsWith(RT.COMPASS)) {
+      // set up config for compass markers
       degrees = parseFloat(markerValue);
-      markerWidth = 2.3 * width;
-      strokeWidth = 0; // width / 8;
       degrees = (degrees + 180) % 360;
       className = "marker compass";
+      if (compassMarker === CM.DOT) {
+        markerWidth = width * 1.5;
+        strokeWidth = width / 5; //this.ring_size <= 2 ? width / 5 : width / 8;
+      } else {
+        markerWidth = 2.3 * width;
+        strokeWidth = 0;
+      }
     } else {
+      // set up config for normal markers
       const clampedMarkerState = clamp(markerValue, this.min, this.max);
       degrees =
         this._startDegrees +
@@ -39,25 +51,55 @@ export function extendWithRenderMarker(RtRingSvg) {
 
     // TODO: Add support for this.outerRadius
     if (this.indicator !== IND.POINTER) {
+      if (compassMarker === CM.DOT) {
+        // dot compass marker
+        return svg`
+        <g class=${className} transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
+          <circle
+            cx=${MID_BOX}
+            cy=${VIEW_BOX - (width * 0.7) / 2}
+            r=${markerWidth / 2}
+            fill=${markerColour}
+            stroke="var(--card-background-color, white)"
+            stroke-width=${strokeWidth}
+          />
+        </g>`;
+      }
+
+      // render normal markers
       const commands = [];
+      // start with the tip of the triangle at the very bottom of the ring
       if (this.indicator === IND.DOT) {
+        // for dot, start the tip at the inside edge of the ring
         commands.push(`M ${MID_BOX} ${VIEW_BOX - width + strokeWidth}`);
+      } else if (this.ring_type.startsWith(RT.COMPASS)) {
+        // for compass, start the tip beyond the outside edge of the ring
+        commands.push(`M ${MID_BOX} ${VIEW_BOX + width / 3 + strokeWidth}`);
       } else {
+        // otherwise, start the tip overlapped with the ring
         commands.push(`M ${MID_BOX} ${VIEW_BOX - width / 3}`);
       }
+      // now plot up and to the right to draw the first side of the triangle
       commands.push(
         `l ${markerWidth / 2} -${markerWidth * Math.sin(deg2rad(60))}`
       );
+      // now plot across to the left to draw the base of the triangle
       if (this.ring_type.startsWith(RT.COMPASS)) {
+        // base of triangle gets kicked in to make an arrow for compass
         commands.push(`l -${markerWidth / 2} ${markerWidth / 6}`);
         commands.push(`l -${markerWidth / 2} -${markerWidth / 6}`);
       } else {
+        // straight base for normal marker
         commands.push(`h -${markerWidth}`);
       }
+      // go back to the start to complete the last side of the triangle
       commands.push(`Z`);
       const triangle = commands.join(" ");
 
-      const pointIn = this.ring_type.startsWith(RT.COMPASS) ? 180 : 0;
+      const pointIn =
+        this.ring_type.startsWith(RT.COMPASS) && compassMarker === CM.IN
+          ? 180
+          : 0;
 
       return svg`
         <g class=${className} transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
@@ -68,11 +110,12 @@ export function extendWithRenderMarker(RtRingSvg) {
             stroke-linejoin="bevel"
             stroke-width=${strokeWidth}
             transform="rotate(${pointIn} ${MID_BOX} ${
-        VIEW_BOX - markerWidth / 2
+        VIEW_BOX - width + (0.5 * width) / 3
       })"
           />
         </g>`;
     } else {
+      // render pointer markers
       const p1 = [MID_BOX, MID_BOX];
       const p2 = getCoordFromDegrees(degrees, MID_BOX - width * 0.75, VIEW_BOX);
       const strokeWidth = [2, 1.6, 1.4, 1.3, 1.2, 1.1][this.ring_size - 1];

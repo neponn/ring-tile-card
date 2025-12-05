@@ -1,6 +1,7 @@
 import { svg, nothing } from "lit";
 import { BE, IND, RT, SCALE, VIEW_BOX } from "../const";
 import { countDecimals, getCoordFromDegrees } from "../helpers/utilities";
+import { getDecimalSeparator } from "../localise/maths";
 
 // Helper function to calculate a "nice" step size
 function calcNiceNum(range, round) {
@@ -144,6 +145,8 @@ export function extendWithRenderScale(RtRingSvg) {
       const p3 = getCoordFromDegrees(degrees, labelRadius, VIEW_BOX);
 
       const fontSize = this.ring_size === 1 ? width * 2.5 : width * 1.15;
+      const dp = getDecimalSeparator();
+      const localeValue = value.replace(".", dp);
 
       return svg`
           <text
@@ -151,7 +154,7 @@ export function extendWithRenderScale(RtRingSvg) {
             text-anchor="middle"
             alignment-baseline="central"
             font-size=${fontSize}
-          >${value}</text>
+          >${localeValue}</text>
         `;
     };
 
