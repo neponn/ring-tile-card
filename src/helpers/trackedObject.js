@@ -56,7 +56,9 @@ export class TrackedObject {
     // override stateObj fields if needed
     // state
     if (this.#elementType === TE_TYPE.ATTRIBUTE)
-      this.#stateObj.state = so.attributes[this.#elementName];
+      // sometimes attributes become unset (eg light brightness when turned off)
+      // take an optimistic view that unset represents 0
+      this.#stateObj.state = so.attributes[this.#elementName] ?? 0;
     // device_class
     if (this.#elementCfg.device_class)
       this.#stateObj.attributes.device_class = this.#elementCfg.device_class;

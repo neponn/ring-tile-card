@@ -11,8 +11,8 @@
   "source": "src/ring-tile-card.js",
   "scripts": {
     "clean": "rm -rf .parcel-cache dist",
-    "start": "parcel",
-    "build": "parcel build --no-source-maps",
+    "start": "BUILD_NUMBER=$(git rev-parse --short HEAD)-$(date +%y%m%d-%H%M)-dev parcel",
+    "build": "BUILD_NUMBER=$(git rev-parse --short HEAD)-$(date +%y%m%d-%H%M)-prod parcel build --no-source-maps",
     "clean-build": "npm run clean && npm run build",
     "rebuild-deps": "npm run clean && ncu -u && rm -rf node_modules package-lock.json && npm i"
   },

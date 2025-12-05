@@ -110,8 +110,8 @@ export class RtRingSvg extends LitElement {
     const scaleDef = {
       minValue: this.min,
       maxValue: this.max,
-      gradStart: (100.0 * this.startDegrees) / 360,
-      gradEnd: (100.0 * this.endDegrees) / 360,
+      gradStart: (100.0 * this._startDegrees) / 360,
+      gradEnd: (100.0 * this._endDegrees) / 360,
     };
     this._grad = new ColourGradientScale(this.colour, scaleDef);
     this.marker_colour = HA_COLOURS[this.marker_colour] || this.marker_colour;
@@ -200,11 +200,31 @@ export class RtRingSvg extends LitElement {
         if (this.ring_type === RT.CLOSED) {
           return nothing;
         }
-        const minText = this.getRoundedValue(this.min, true);
-        const maxText =
-          this.max - this.min < 0.01
-            ? "–"
-            : this.getRoundedValue(this.max, true);
+
+        // try to avoid min and max tangling by reducing number of decimal
+        // places if it helps
+        let minText;
+        let maxText;
+        let trimDecimals = 0;
+        do {
+          minText = this.getRoundedValue(
+            this.min,
+            true,
+            this.max_decimals - trimDecimals
+          );
+          maxText =
+            this.max - this.min < 0.01
+              ? "–"
+              : this.getRoundedValue(
+                  this.max,
+                  true,
+                  this.max_decimals - trimDecimals
+                );
+        } while (
+          minText.length + maxText.length >
+            [5, 5, 7, 8, 9, 11][this.ring_size - 1] &&
+          trimDecimals++ < this.max_decimals
+        );
 
         return svg`
           ${this.renderText(minText, "", POS.MIN)}
@@ -221,7 +241,7 @@ export class RtRingSvg extends LitElement {
         const value = [BE.RING_VALUE, BE.RING_VALUE_UNIT].includes(
           this.bottom_element
         )
-          ? this.value
+          ? this.state.value
           : this.display_state.value;
 
         let unit = "";

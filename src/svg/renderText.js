@@ -1,6 +1,7 @@
 import { svg, nothing } from "lit";
 import { clamp, isNumber } from "../helpers/utilities";
 import { MID_BOX, POS, RT, SCALE } from "../const";
+import { getDecimalSeparator } from "../localise/maths";
 
 // export function renderText(cfg, value, unit, position) {
 export function extendWithRenderText(RtRingSvg) {
@@ -10,9 +11,10 @@ export function extendWithRenderText(RtRingSvg) {
       unitScale = 1.0,
       maxLengthForScaling = 6
     ) {
+      const dp = getDecimalSeparator();
       const valueLength =
         value.length -
-        (value.includes(".") ? 0.7 : 0) -
+        (value.includes(dp) ? 0.7 : 0) -
         (value.includes("°") ? 0.5 : 0);
       const unitLength = unit.length * unitScale;
 
