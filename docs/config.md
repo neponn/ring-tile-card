@@ -36,6 +36,8 @@ This page describes the configuration options and how they work.
 | `min_sig_figs` | number | 2 | Specify the minimum number of significant figures to use when rendering a value inside the ring. This can be more useful than the conventional `display_precision` to keep the width of the rendered value reasonably consistent. By way of example, a setting of 2 will produce output like 0.12, 1.2 or 12 |
 | `max_decimals` | number | 1 | Used with `min_sig_figs` to provider further control over the rendering of values inside the ring. The default settings of `min_sig_figs: 2` and `max_decimals: 1` will produce output like 0.1, 1.2, 12 |
 | `hide_state` | boolean | `false` | Enable or disable the entity value in the info area to the right of the ring |
+| `tap_action` | map | `action: more-info` | Specify the action that should be taken when tapping on `ring-tile` card. By default, show `more-info` for the `entity`. All standard `action` [config options](https://www.home-assistant.io/dashboards/actions/) supported. |
+| `icon_tap_action` | map | `action: more-info` | Specify the action that should be taken when tapping on the icon / ring. By default, show `more-info` for the `entity` (or `ring_entity` if defined). All standard `action` [config options](https://www.home-assistant.io/dashboards/actions/) supported. |
 
 Defaults shown in the table are for a `ring_size: 1`, where no `device_class` has been detected. As [described below](#default-handling), alternative defaults may be applied based on detected `device_class` and `ring_size`. Your settings always override defaults.
 

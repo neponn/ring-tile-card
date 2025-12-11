@@ -123,7 +123,8 @@ export class RingTile extends LitElement {
       this._config.name || this._displayStateObj.attributes["friendly_name"];
     this._config.bottom_name = this._config.bottom_name || this._name;
 
-    this._config.ring_only = this._config.ring_only || this._config.ring_size >= 3;
+    this._config.ring_only =
+      this._config.ring_only || this._config.ring_size >= 3;
 
     this._configProcessed = true;
   }
@@ -167,7 +168,10 @@ export class RingTile extends LitElement {
     }
 
     if (this._config.marker2 != null) {
-      this._marker2Element = new TrackedObject(this._config.marker2, this._hass);
+      this._marker2Element = new TrackedObject(
+        this._config.marker2,
+        this._hass
+      );
       this._marker2Value = parseFloat(this._marker2Element.value);
     }
 
@@ -217,7 +221,7 @@ export class RingTile extends LitElement {
       <ha-card class="active type-tile ${classMap(cardClasses)}">
         <div
           class="background"
-          @click=${(ev) => this._handleAction(ev, this._config.tap_action)}
+          @click=${(ev) => this._handleCardAction()}
           role=${ifDefined(this._hasCardAction ? "button" : undefined)}
           tabindex=${ifDefined(this._hasCardAction ? "0" : undefined)}
           aria-labelledby="info"
@@ -232,8 +236,11 @@ export class RingTile extends LitElement {
               data-domain="sensor"
               data-state=${stateStr}
               ring_size=${this._config.ring_size}
-              @click=${(ev) =>
-                this._handleAction(ev, this._config.icon_tap_action)}
+              @click=${ifDefined(
+                this._hasIconAction
+                  ? (ev) => this._handleIconAction()
+                  : undefined
+              )}
             >
               <rt-ring-svg
                 style="width:${ringPixels}px;height:${ringPixels}px;"
@@ -286,6 +293,59 @@ export class RingTile extends LitElement {
       </ha-card>
     `;
     return renderString;
+  }
+
+  get _hasCardAction() {
+    return this._config.tap_action && this._config.tap_action.action !== "none";
+  }
+
+  get _hasIconAction() {
+    return (
+      this._config.ring_entity !== undefined ||
+      (this._config.icon_tap_action &&
+        this._config.icon_tap_action.action !== "none")
+    );
+  }
+
+  _handleCardAction(ev) {
+    if (!this._config.tap_action) return;
+    const entityId =
+      this._config.tap_action?.entity || this._displayElement.entityName;
+
+    const actionConfig = {
+      entity: entityId,
+      tap_action: this._config.tap_action,
+    };
+
+    this._handleAction(actionConfig);
+  }
+
+  _handleIconAction(ev) {
+    if (!this._config.ring_entity && !this._config.icon_tap_action) return;
+    const entityId =
+      this._config.icon_tap_action?.entity ||
+      (this._config.ring_entity
+        ? this._ringElement.entityName
+        : this._displayElement.entityName);
+
+    const actionConfig = {
+      entity: entityId,
+      tap_action: this._config.icon_tap_action || { action: "more-info" },
+    };
+
+    this._handleAction(actionConfig);
+  }
+
+  _handleAction(actionConfig) {
+    const event = new Event("hass-action", {
+      bubbles: true,
+      composed: true,
+    });
+    event.detail = {
+      config: actionConfig,
+      action: "tap",
+    };
+    this.dispatchEvent(event);
   }
 
   static getStubConfig(hass, entities, entitiesFallback) {
@@ -469,64 +529,4 @@ export class RingTile extends LitElement {
       }
     }
   `;
-
-  _handleAction(event, actionConfig) {
-    if (!actionConfig || !actionConfig.action) return;
-
-    const entityId =
-      actionConfig.tapped === "icon" && this._config.ring_entity
-        ? this._ringElement.entityName
-        : this._displayElement.entityName;
-
-    switch (actionConfig.action) {
-      case "more-info":
-        if (entityId) {
-          this.dispatchEvent(
-            new CustomEvent("hass-more-info", {
-              bubbles: true,
-              composed: true,
-              detail: { entityId },
-            })
-          );
-        }
-        break;
-      case "navigate":
-        if (actionConfig.navigation_path) {
-          window.history.pushState(null, "", actionConfig.navigation_path);
-          this.dispatchEvent(
-            new CustomEvent("location-changed", {
-              bubbles: true,
-              composed: true,
-            })
-          );
-        }
-        break;
-      case "call-service":
-        if (actionConfig.service) {
-          const [domain, service] = actionConfig.service.split(".", 2);
-          this._hass.callService(
-            domain,
-            service,
-            actionConfig.service_data || {}
-          );
-        }
-        break;
-      case "url":
-        if (actionConfig.url) {
-          window.open(actionConfig.url, "_blank");
-        }
-        break;
-      default:
-        console.warn(`Unhandled action type: ${actionConfig.action}`);
-    }
-  }
-
-  _hasCardAction() {
-    return this._config.tap_action && this._config.tap_action.action !== "none";
-  }
-  _hasIconAction() {
-    return (
-      this._config.icon_tap_action && this._config.icon_tap_action.action !== "none"
-    );
-  }
 }
