@@ -37,7 +37,11 @@ This page describes the configuration options and how they work.
 | `max_decimals` | number | 1 | Used with `min_sig_figs` to provider further control over the rendering of values inside the ring. The default settings of `min_sig_figs: 2` and `max_decimals: 1` will produce output like 0.1, 1.2, 12 |
 | `hide_state` | boolean | `false` | Enable or disable the entity value in the info area to the right of the ring |
 | `tap_action` | map | `action: more-info` | Specify the action that should be taken when tapping on `ring-tile` card. By default, show `more-info` for the `entity`. All standard `action` [config options](https://www.home-assistant.io/dashboards/actions/) supported. |
+| `hold_action` | map | | Action take on tap-and-hold. See `action` [config options](https://www.home-assistant.io/dashboards/actions/) |
+| `double_tap_action` | map | | Action take on double tap. See `action` [config options](https://www.home-assistant.io/dashboards/actions/) |
 | `icon_tap_action` | map | `action: more-info` | Specify the action that should be taken when tapping on the icon / ring. By default, show `more-info` for the `entity` (or `ring_entity` if defined). All standard `action` [config options](https://www.home-assistant.io/dashboards/actions/) supported. |
+| `icon_hold_action` | map | | Action take on icon / ring tap-and-hold. See `action` [config options](https://www.home-assistant.io/dashboards/actions/) |
+| `icon_double_tap_action` | map | | Action take on icon / ring double tap. See `action` [config options](https://www.home-assistant.io/dashboards/actions/) |
 
 Defaults shown in the table are for a `ring_size: 1`, where no `device_class` has been detected. As [described below](#default-handling), alternative defaults may be applied based on detected `device_class` and `ring_size`. Your settings always override defaults.
 

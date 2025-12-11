@@ -31,6 +31,10 @@ export class RingTile extends LitElement {
     };
   }
 
+  // ============================================================================
+  // Config and default handling
+  // ============================================================================
+
   processConfig() {
     // Resolve defaults based on specific device_class and measurement_unit
     // if they are specified. Combine with base defaults (the null case)
@@ -144,6 +148,10 @@ export class RingTile extends LitElement {
     }
   }
 
+  // ============================================================================
+  // State management
+  // ============================================================================
+
   set hass(hass) {
     this._hass = hass;
 
@@ -189,6 +197,10 @@ export class RingTile extends LitElement {
     }
   }
 
+  // ============================================================================
+  // Card composition
+  // ============================================================================
+
   render() {
     const stateStr = this._ringStateObj
       ? parseFloat(this._ringElement.value)
@@ -221,7 +233,10 @@ export class RingTile extends LitElement {
       <ha-card class="active type-tile ${classMap(cardClasses)}">
         <div
           class="background"
-          @click=${(ev) => this._handleCardAction()}
+          @pointerdown=${(ev) => this._onPointerDown(ev, "card")}
+          @pointerup=${(ev) => this._onPointerUp(ev, "card")}
+          @pointercancel=${(ev) => this._onPointerCancel(ev, "card")}
+          @dblclick=${(ev) => this._onPointerDouble(ev, "card")}
           role=${ifDefined(this._hasCardAction ? "button" : undefined)}
           tabindex=${ifDefined(this._hasCardAction ? "0" : undefined)}
           aria-labelledby="info"
@@ -236,9 +251,24 @@ export class RingTile extends LitElement {
               data-domain="sensor"
               data-state=${stateStr}
               ring_size=${this._config.ring_size}
-              @click=${ifDefined(
+              @pointerdown=${ifDefined(
                 this._hasIconAction
-                  ? (ev) => this._handleIconAction()
+                  ? (ev) => this._onPointerDown(ev, "icon")
+                  : undefined
+              )}
+              @pointerup=${ifDefined(
+                this._hasIconAction
+                  ? (ev) => this._onPointerUp(ev, "icon")
+                  : undefined
+              )}
+              @pointercancel=${ifDefined(
+                this._hasIconAction
+                  ? (ev) => this._onPointerCancel(ev, "icon")
+                  : undefined
+              )}
+              @dblclick=${ifDefined(
+                this._hasIconAction
+                  ? (ev) => this._onPointerDouble(ev, "icon")
                   : undefined
               )}
             >
@@ -295,58 +325,181 @@ export class RingTile extends LitElement {
     return renderString;
   }
 
+  // ============================================================================
+  // Action handling
+  // ============================================================================
+
+  _holdTimers = {};
+  _singleTapTimers = {};
+  _lastTap = {};
+  _holdFired = {};
+
   get _hasCardAction() {
-    return this._config.tap_action && this._config.tap_action.action !== "none";
+    return (
+      (this._config.tap_action && this._config.tap_action.action !== "none") ||
+      (this._config.hold_action &&
+        this._config.hold_action.action !== "none") ||
+      (this._config.double_tap_action &&
+        this._config.double_tap_action.action !== "none")
+    );
   }
 
   get _hasIconAction() {
     return (
       this._config.ring_entity !== undefined ||
       (this._config.icon_tap_action &&
-        this._config.icon_tap_action.action !== "none")
+        this._config.icon_tap_action.action !== "none") ||
+      (this._config.icon_hold_action &&
+        this._config.icon_hold_action.action !== "none") ||
+      (this._config.icon_double_tap_action &&
+        this._config.icon_double_tap_action.action !== "none")
     );
   }
 
-  _handleCardAction(ev) {
-    if (!this._config.tap_action) return;
-    const entityId =
-      this._config.tap_action?.entity || this._displayElement.entityName;
+  _onPointerDown(ev, context) {
+    if (context === "icon") ev.stopPropagation();
 
-    const actionConfig = {
-      entity: entityId,
-      tap_action: this._config.tap_action,
-    };
+    const hasAny =
+      (context === "card" && this._hasCardAction) ||
+      (context === "icon" && this._hasIconAction);
 
-    this._handleAction(actionConfig);
+    if (!hasAny) return;
+    const HOLD_THRESHOLD = 500;
+
+    this._holdFired[context] = false;
+    this._holdTimers[context] = setTimeout(() => {
+      this._holdFired[context] = true;
+      this._fireAction(context, "hold");
+    }, HOLD_THRESHOLD);
   }
 
-  _handleIconAction(ev) {
-    if (!this._config.ring_entity && !this._config.icon_tap_action) return;
+  _onPointerUp(ev, context) {
+    if (context === "icon") ev.stopPropagation();
+
+    if (this._holdTimers[context]) {
+      clearTimeout(this._holdTimers[context]);
+      delete this._holdTimers[context];
+    }
+
+    if (this._holdFired[context]) {
+      this._holdFired[context] = false;
+      return;
+    }
+
+    const now = Date.now();
+    const last = this._lastTap[context] || 0;
+    const DOUBLE_TAP_THRESHOLD = 300;
+
+    // Check if double-tap action is configured for this context
+    const hasDoubleTap =
+      (context === "card" && this._config.double_tap_action) ||
+      (context === "icon" && this._config.icon_double_tap_action);
+
+    if (now - last <= DOUBLE_TAP_THRESHOLD) {
+      // Second tap within threshold — fire double-tap if configured
+      if (this._singleTapTimers[context]) {
+        clearTimeout(this._singleTapTimers[context]);
+        delete this._singleTapTimers[context];
+      }
+      this._lastTap[context] = 0;
+      this._fireAction(context, "double_tap");
+    } else if (hasDoubleTap) {
+      // First tap, but double-tap is possible — wait to see if second tap comes
+      this._lastTap[context] = now;
+      this._singleTapTimers[context] = setTimeout(() => {
+        this._singleTapTimers[context] = undefined;
+        this._lastTap[context] = 0;
+        this._fireAction(context, "tap");
+      }, DOUBLE_TAP_THRESHOLD);
+    } else {
+      // No double-tap configured — fire tap immediately
+      this._lastTap[context] = 0;
+      this._fireAction(context, "tap");
+    }
+  }
+
+  _onPointerCancel(ev, context) {
+    if (context === "icon") ev.stopPropagation();
+    if (this._holdTimers[context]) {
+      clearTimeout(this._holdTimers[context]);
+      delete this._holdTimers[context];
+    }
+    if (this._singleTapTimers[context]) {
+      clearTimeout(this._singleTapTimers[context]);
+      delete this._singleTapTimers[context];
+    }
+    this._holdFired[context] = false;
+    this._lastTap[context] = 0;
+  }
+
+  _onPointerDouble(ev, context) {
+    if (context === "icon") ev.stopPropagation();
+    if (this._singleTapTimers[context]) {
+      clearTimeout(this._singleTapTimers[context]);
+      delete this._singleTapTimers[context];
+    }
+    if (this._holdTimers[context]) {
+      clearTimeout(this._holdTimers[context]);
+      delete this._holdTimers[context];
+    }
+    this._lastTap[context] = 0;
+    this._fireAction(context, "double_tap");
+  }
+
+  _fireAction(context, actionType) {
+    // Map context and action type to config key
+    const configMap = {
+      card: { tap: "tap_action", hold: "hold_action", double_tap: "double_tap_action" },
+      icon: {
+        tap: "icon_tap_action",
+        hold: "icon_hold_action",
+        double_tap: "icon_double_tap_action",
+      },
+    };
+
+    const configKey = configMap[context][actionType];
+    const actionConfig = this._config[configKey];
+
+    // Icon tap with no icon_tap_action and no ring_entity falls through to card
+    if (
+      !actionConfig &&
+      context === "icon" &&
+      actionType === "tap" &&
+      !this._config.ring_entity
+    ) {
+      this._fireAction("card", actionType);
+      return;
+    }
+
+    if (!actionConfig) return;
+
     const entityId =
-      this._config.icon_tap_action?.entity ||
-      (this._config.ring_entity
+      actionConfig.entity ||
+      (context === "icon" && this._config.ring_entity
         ? this._ringElement.entityName
         : this._displayElement.entityName);
 
-    const actionConfig = {
-      entity: entityId,
-      tap_action: this._config.icon_tap_action || { action: "more-info" },
-    };
-
-    this._handleAction(actionConfig);
+    this._handleAction(
+      { entity: entityId, tap_action: actionConfig },
+      actionType
+    );
   }
 
-  _handleAction(actionConfig) {
+  _handleAction(actionConfig, actionName = "tap") {
     const event = new Event("hass-action", {
       bubbles: true,
       composed: true,
     });
     event.detail = {
       config: actionConfig,
-      action: "tap",
+      action: actionName,
     };
     this.dispatchEvent(event);
   }
+
+  // ============================================================================
+  // Card formatting
+  // ============================================================================
 
   static getStubConfig(hass, entities, entitiesFallback) {
     // find temperature sensors, if there are any
@@ -386,6 +539,10 @@ export class RingTile extends LitElement {
       min_rows: rows,
     };
   }
+
+  // ============================================================================
+  // Style sheet
+  // ============================================================================
 
   static styles = css`
     :host {
