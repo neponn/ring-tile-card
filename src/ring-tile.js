@@ -449,7 +449,11 @@ export class RingTile extends LitElement {
   _fireAction(context, actionType) {
     // Map context and action type to config key
     const configMap = {
-      card: { tap: "tap_action", hold: "hold_action", double_tap: "double_tap_action" },
+      card: {
+        tap: "tap_action",
+        hold: "hold_action",
+        double_tap: "double_tap_action",
+      },
       icon: {
         tap: "icon_tap_action",
         hold: "icon_hold_action",
@@ -458,26 +462,26 @@ export class RingTile extends LitElement {
     };
 
     const configKey = configMap[context][actionType];
-    const actionConfig = this._config[configKey];
+    let actionConfig = this._config[configKey];
+    let entityId;
 
-    // Icon tap with no icon_tap_action and no ring_entity falls through to card
-    if (
-      !actionConfig &&
-      context === "icon" &&
-      actionType === "tap" &&
-      !this._config.ring_entity
-    ) {
-      this._fireAction("card", actionType);
-      return;
+    // Handle icon tap with no icon_tap_action
+    if (!actionConfig && context === "icon" && actionType === "tap")
+      if (!this._config.ring_entity) {
+        // no ring_entity, so fall through to card
+        this._fireAction("card", actionType);
+        return;
+      } else {
+        // default to more-info and use the ring_entity
+        actionConfig = { action: "more-info" };
+        entityId = this._ringElement.entityName;
+      }
+    else {
+      // all other cases (normal)
+      entityId = actionConfig.entity || this._displayElement.entityName;
     }
 
     if (!actionConfig) return;
-
-    const entityId =
-      actionConfig.entity ||
-      (context === "icon" && this._config.ring_entity
-        ? this._ringElement.entityName
-        : this._displayElement.entityName);
 
     this._handleAction(
       { entity: entityId, tap_action: actionConfig },
