@@ -110,7 +110,8 @@ export function extendWithRenderIcon(RtRingSvg) {
 
     let scale;
     let translateDown;
-    let baseColour = "var(--rt-icon-color, var(--tile-icon-color))";
+    let baseColour =
+      "var(--rt-icon-color, var(--rt-icon-colour, var(--tile-icon-color)))";
     switch (position) {
       case POS.TOP:
         scale = [0, 0.625, 0.65, 0.566, 0.667, 0.667][this.ring_size - 1];
@@ -122,14 +123,14 @@ export function extendWithRenderIcon(RtRingSvg) {
           scale *= 0.95;
           translateDown *= 0.93;
         }
-        baseColour = `var(--rt-icon-color, 
+        baseColour = `var(--rt-icon-color, var(--rt-icon-colour,
                         color-mix(
                           in srgb, 
                           var(--primary-text-color, #212121) 
-                          var(--top-icon-opacity, 50%), 
+                          var(--rt-top-icon-opacity, 50%), 
                           transparent
                         )
-                      )`;
+                      ))`;
         break;
 
       case POS.MIDDLE:

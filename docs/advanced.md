@@ -20,7 +20,7 @@ entity: sensor.iphone_battery_level
 card_mod:
   style: |
     * {
-      --rt-icon-color: {{ 
+      --rt-icon-colour: {{ 
           "darkorange" 
           if states("sensor.iphone_battery_state") == "Charging"
           else "var(--)" 
@@ -28,7 +28,7 @@ card_mod:
     }
 ```
 
-In this example, the colour of the icon is changed to `darkorange` if the iPhone battery is charging (default colour if not). This is achieved by using a `card_mod` style template to dynamically update the `--rt-icon-color` CSS variable.
+In this example, the colour of the icon is changed to `darkorange` if the iPhone battery is charging (default colour if not). This is achieved by using a `card_mod` style template to dynamically update the `--rt-icon-colour` CSS variable.
 
 Another example: you can **statically** change the opacity of the ring background.
 
@@ -59,11 +59,11 @@ Important to note that the `tweaks` method only supports static styling; if you 
 
 ### CSS variables available
 
-`ring-tile` exposes a bunch of CSS variables that you can manipulate. As described above, you can use these either with `card_mod`, in which case use the CSS variable, or - for static styling - via the `tweaks` config option. There is also an inbuilt `tweaks` option that takes care of a common CSS styling jobs (may add more over time).
+`ring-tile` exposes a bunch of CSS variables that you can manipulate. As described above, you can use these either with `card_mod`, in which case use the CSS variable, or &mdash; for static styling &mdash; via the `tweaks` config option. There are also a few inbuilt `tweaks` options that takes care of common CSS styling jobs.
 
 | CSS variable | `tweaks` option | Purpose | Type | Default |
 |--------------|-----------------|---------|------|---------|
-| `--rt-icon-color` | `rt-icon-color` | Override icon colour | CSS colour code | `ha_blue` middle and bottom positions; `ha_grey` top |
+| `--rt-icon-colour` | `rt-icon-colour` | Override icon colour | CSS colour code | `ha_blue` middle and bottom positions; `ha_grey` top |
 | `--rt-top-icon-opacity` | `rt-top-icon-opacity` | Icon opacity when rendered in top position | `0%`-`100%` | `50%` |
 | `--card-mod-icon` | N/A | Override the configured icon (`card_mod` [feature](https://github.com/thomasloven/lovelace-card-mod#changing-icons)) | HA icon code (eg `mdi:eye`) | per config |
 | `--rt-ring-colour` | `rt-ring-colour` | Override the ring colour (most useful for dynamic styling) | CSS colour code | As configured in `colours` config option |
@@ -75,11 +75,15 @@ Important to note that the `tweaks` method only supports static styling; if you 
 | `--rt-marker2-colour` | `rt-marker2-colour` | Override the `marker2` colour | CSS colour code | light grey |
 | `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | Geist |
 | `--rt-ring-svg-size` | `rt-ring-svg-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
-| N/A | `transparent_tile` | Get rid of background and border | Boolean | `False` |
+| N/A | `transparent_tile` | No background and no border | Boolean | `False` |
+| N/A | `tile_rows` | Customise the total height of the `ring-tile` card | `1.0`-`6.0`, card layout row units | `ring_size` row units |
+| N/A | `tile_columns` | Customise the total width of the `ring-tile` card | `1.5`-`12.0`, card layout column units | 6 column units |
+
+Note: `colour` may also be spelled `color`.
 
 ### Home Assistant friendly colours
 
-Note that [colour shortcuts](config.md/#home-assistant-friendly-colour-shortcuts) provided by `ring-tile` **do not** work with `card_mod`. You can achieve a similar result using Home Assistant built in CSS colour variables, [see below](#ha-friendly-colour-alternatives).
+Note that [colour shortcuts](config.md/#home-assistant-friendly-colour-shortcuts) provided by `ring-tile` **do not** work with `card_mod`. You can achieve a similar result using Home Assistant built in CSS colour variables, [see below](#ha-friendly-colour-alternatives). Colour shortcuts **do** work with `tweaks` options, however.
 
 ## Manipulating ring-tile HTML / SVG elements
 
