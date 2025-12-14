@@ -230,7 +230,7 @@ export class RingTile extends LitElement {
       this._config.default_icon;
 
     const renderString = html`
-      <ha-card class="active type-tile ${classMap(cardClasses)}">
+      <ha-card class="active ${classMap(cardClasses)}">
         <div
           class="background"
           @pointerdown=${(ev) => this._onPointerDown(ev, "card")}
@@ -248,8 +248,7 @@ export class RingTile extends LitElement {
             <rt-ring
               role=${ifDefined(this._hasIconAction ? "button" : undefined)}
               tabindex=${ifDefined(this._hasIconAction ? "0" : undefined)}
-              data-domain="sensor"
-              data-state=${stateStr}
+              .interactive=${this._hasIconAction}
               ring_size=${this._config.ring_size}
               @pointerdown=${ifDefined(
                 this._hasIconAction
