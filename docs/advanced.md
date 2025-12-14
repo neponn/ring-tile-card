@@ -74,7 +74,7 @@ Important to note that the `tweaks` method only supports static styling; if you 
 | `--rt-marker-colour` | `rt-marker-colour` | Override the `marker` colour | CSS colour code | grey |
 | `--rt-marker2-colour` | `rt-marker2-colour` | Override the `marker2` colour | CSS colour code | light grey |
 | `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | Geist |
-| `--rt-svg-viewBox-size` | `rt-svg-viewBox-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
+| `--rt-ring-svg-size` | `rt-ring-svg-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
 | N/A | `transparent_tile` | Get rid of background and border | Boolean | `False` |
 
 ### Home Assistant friendly colours

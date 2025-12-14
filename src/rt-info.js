@@ -76,7 +76,7 @@ export class RtInfo extends LitElement {
       color: var(--primary-text-color);
     }
     .secondary.large {
-      font-family: Geist, var(--ha-font-family-body);
+      font-family: var(--rt-font-family, Geist), var(--ha-font-family-body);
       font-optical-sizing: auto;
       font-style: normal;
       font-weight: 600;

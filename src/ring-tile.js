@@ -272,7 +272,8 @@ export class RingTile extends LitElement {
               )}
             >
               <rt-ring-svg
-                style="width:${ringPixels}px;height:${ringPixels}px;"
+                style="width: var(--rt-ring-svg-size, ${ringPixels}px);
+                  height: var(--rt-ring-svg-size, ${ringPixels}px);"
                 slot="icon"
                 ring_type=${this._config.ring_type}
                 ring_size=${this._config.ring_size}
@@ -615,8 +616,6 @@ export class RingTile extends LitElement {
       overflow: hidden;
     }
     .content.centred {
-      /* margin: auto;
-      padding: 0; */
       justify-content: center;
     }
     .content.large {

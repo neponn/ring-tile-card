@@ -53,6 +53,10 @@ export class ColourGradientScale {
     }
   }
 
+  #applyColour(colour) {
+    return `var(--rt-ring-color, var(--rt-ring-colour, ${colour}))`;
+  }
+
   #scaleToGrad(rawValue) {
     // convert the rawValue to % on the grad, constrained to the operating
     // of the grad
@@ -67,15 +71,17 @@ export class ColourGradientScale {
   getConicGradientCss(opacity = 1) {
     // if we've just got a single colour, just return it
     if (this.#isSingleColour) {
-      return `background: color-mix(in srgb, ${
+      return `background: color-mix(in srgb, ${this.#applyColour(
         this.#grad
-      } var(--rt-ring-background-opacity, ${100.0 * opacity}%), transparent);`;
+      )} var(--rt-ring-background-opacity, ${100.0 * opacity}%), transparent);`;
     }
     // build the gradient
     const gradCSS = this.#grad.map((grad) => {
-      return `color-mix(in srgb, ${grad.colour} var(--rt-ring-background-opacity, ${
-        100.0 * opacity
-      }%), transparent) ${grad.value}%`;
+      return `color-mix(in srgb, ${this.#applyColour(
+        grad.colour
+      )} var(--rt-ring-background-opacity, ${100.0 * opacity}%), transparent) ${
+        grad.value
+      }%`;
     });
     // return the full CSS
     return `background-image: conic-gradient(
@@ -92,7 +98,7 @@ export class ColourGradientScale {
       ((gradPct - this.#gradStart) / (this.#gradEnd - this.#gradStart)) *
         (this.#maxValue - this.#minValue);
     // get the colour at that value
-    return this.getSolidColour(rawValue);
+    return this.#applyColour(this.getSolidColour(rawValue));
   }
 
   getSolidColour(rawValue) {
@@ -102,14 +108,14 @@ export class ColourGradientScale {
     }
     // is it a single colour?
     if (this.#isSingleColour) {
-      return this.#grad;
+      return this.#applyColour(this.#grad);
     }
     // are we out of range?
     if (this.#scaleToGrad(rawValue) < this.#grad[0].value) {
-      return this.#grad[0].colour;
+      return this.#applyColour(this.#grad[0].colour);
     }
     if (this.#scaleToGrad(rawValue) > this.#grad.at(-1).value) {
-      return this.#grad.at(-1).colour;
+      return this.#applyColour(this.#grad.at(-1).colour);
     }
 
     // mix a colour from the grad at rawValue
@@ -117,22 +123,22 @@ export class ColourGradientScale {
     // is it a direct match?
     const entry = this.#grad.find((g) => g.value === gradValue);
     if (entry) {
-      return entry.colour;
+      return this.#applyColour(entry.colour);
     }
     const lowEntry = this.#grad.findLast((g) => g.value < gradValue);
     const highEntry = this.#grad.find((g) => g.value > gradValue);
     // are the two entries the same?
     if (lowEntry.colour === highEntry.colour) {
-      return lowEntry.colour;
+      return this.#applyColour(lowEntry.colour);
     }
     // ok, mix a colour
     const ratio =
       (100.0 * (gradValue - lowEntry.value)) /
       (highEntry.value - lowEntry.value);
-    return `color-mix(in srgb,
+    return this.#applyColour(`color-mix(in srgb,
         ${lowEntry.colour} ${100 - ratio}%,
         ${highEntry.colour} ${ratio}%
       )
-    `;
+    `);
   }
 }
