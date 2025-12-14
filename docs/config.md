@@ -42,6 +42,7 @@ This page describes the configuration options and how they work.
 | `icon_tap_action` | map | `action: more-info` | Specify the action that should be taken when tapping on the icon / ring. By default, show `more-info` for the `entity` (or `ring_entity` if defined). All standard `action` [config options](https://www.home-assistant.io/dashboards/actions/) supported. |
 | `icon_hold_action` | map | | Action take on icon / ring tap-and-hold. See `action` [config options](https://www.home-assistant.io/dashboards/actions/) |
 | `icon_double_tap_action` | map | | Action take on icon / ring double tap. See `action` [config options](https://www.home-assistant.io/dashboards/actions/) |
+| `tweaks` | map | | [Apply static style overrides](/docs/advanced.md#css-variables-available). Advanced option. |
 
 Defaults shown in the table are for a `ring_size: 1`, where no `device_class` has been detected. As [described below](#default-handling), alternative defaults may be applied based on detected `device_class` and `ring_size`. Your settings always override defaults.
 

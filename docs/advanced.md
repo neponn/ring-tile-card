@@ -10,7 +10,7 @@ There are two ways in which `ring-tile` has been designed for `card-mod` use: [o
 
 ## Overriding CSS colour variables
 
-Best to start with an example.
+Best to start with an example. First, an example of **dynamic** styling. This example makes use of `card_mod` to set a CSS variable based on the state of an entity by using a template.
 
 <img src="img/ad-battery-charging.png" width="250">
 
@@ -28,9 +28,9 @@ card_mod:
     }
 ```
 
-In this example, the colour of the icon is changed to `darkorange` if the iPhone battery is charging (default colour if not). This is achieved by using a `card-mod` style template to dynamically update the `--rt-icon-color` CSS variable.
+In this example, the colour of the icon is changed to `darkorange` if the iPhone battery is charging (default colour if not). This is achieved by using a `card_mod` style template to dynamically update the `--rt-icon-color` CSS variable.
 
-Another example: you can statically change the opacity of the ring background.
+Another example: you can **statically** change the opacity of the ring background.
 
 <img src="img/ad-ring-background.png" width="250">
 
@@ -45,19 +45,37 @@ card_mod:
     }
 ```
 
+For static styling you can alternatively use the `tweaks` config option:
+
+```yaml
+type: custom:ring-tile
+entity: sensor.humidity
+ring_size: 2
+tweaks:
+  rt-ring-background-opacity: 20%
+```
+
+Important to note that the `tweaks` method only supports static styling; if you want to style something dynamically (with a template), you'll need to use the `card_mod` option.
+
 ### CSS variables available
 
-`ring-tile` offers the following CSS variables:
+`ring-tile` exposes a bunch of CSS variables that you can manipulate. As described above, you can use these either with `card_mod`, in which case use the CSS variable, or - for static styling - via the `tweaks` config option. There is also an inbuilt `tweaks` option that takes care of a common CSS styling jobs (may add more over time).
 
-| CSS variable | Purpose | Type | Default |
-|--------------|---------|------|---------|
-| `--rt-icon-color` | Override icon colour | CSS colour code | `ha_blue` middle and bottom positions; `ha_grey` top |
-| `--rt-top-icon-opacity` | Icon opacity when rendered in top position | `0%`-`100%` | `50%` |
-| `--rt-ring-background-opacity` | Opacity used for the ring background  | `0%`-`100%` | depends on ring |
-| `--rt-background-text-opacity` | Text opacity used for top, bottom and units | `0`-`1` | `0.6` |
-| `--rt-scale-text-opacity` | Text opacity used for scale labels | `0`-`1` | `0.5` |
-| `--rt-pointer-colour` | Override the `pointer` colour | CSS colour code | `orange` |
-| `--card-mod-icon` | Override the configured icon (`card_mod` [feature](https://github.com/thomasloven/lovelace-card-mod#changing-icons)) | HA icon code (eg `mdi:eye`) | per config |
+| CSS variable | `tweaks` option | Purpose | Type | Default |
+|--------------|-----------------|---------|------|---------|
+| `--rt-icon-color` | `rt-icon-color` | Override icon colour | CSS colour code | `ha_blue` middle and bottom positions; `ha_grey` top |
+| `--rt-top-icon-opacity` | `rt-top-icon-opacity` | Icon opacity when rendered in top position | `0%`-`100%` | `50%` |
+| `--card-mod-icon` | N/A | Override the configured icon (`card_mod` [feature](https://github.com/thomasloven/lovelace-card-mod#changing-icons)) | HA icon code (eg `mdi:eye`) | per config |
+| `--rt-ring-colour` | `rt-ring-colour` | Override the ring colour (most useful for dynamic styling) | CSS colour code | As configured in `colours` config option |
+| `--rt-ring-background-opacity` | `rt-ring-background-opacity` | Opacity used for the ring background  | `0%`-`100%` | depends on ring |
+| `--rt-background-text-opacity` | `rt-background-text-opacity` | Text opacity used for top, bottom and units | `0`-`1` | `0.6` |
+| `--rt-scale-text-opacity` | `rt-scale-text-opacity` | Text opacity used for scale labels | `0`-`1` | `0.5` |
+| `--rt-pointer-colour` | `rt-pointer-colour` | Override the `pointer` colour | CSS colour code | `orange` |
+| `--rt-marker-colour` | `rt-marker-colour` | Override the `marker` colour | CSS colour code | grey |
+| `--rt-marker2-colour` | `rt-marker2-colour` | Override the `marker2` colour | CSS colour code | light grey |
+| `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | Geist |
+| `--rt-svg-viewBox-size` | `rt-svg-viewBox-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
+| N/A | `transparent_tile` | Get rid of background and border | Boolean | `False` |
 
 ### Home Assistant friendly colours
 
@@ -96,8 +114,7 @@ card_mod:
 * The top level element is `ring-tile`
 * Ring elements live in a shadow-root inside `rt-ring-svg`
   * To access ring elements, use `rt-ring-svg $: |` before selecting the targeted elements (like in the example above)
-* Icons are rendered as HTML, top level `ha-state-icon` (a Home Assistant component, which actually renders the icon as SVG in the end)
-* All other elements are rendered as SVG, split into three groups, with class names assigned as follows:
+* All elements are rendered as SVG, split into three groups, with class names assigned as follows:
   * `elements`: these are the `top` / `middle` / `bottom` elements
   * `ring`: the ring itself, plus an optional `scale` group, containing:
     * `ticks` and `labels` groups
@@ -111,7 +128,7 @@ The easiest way to find your way around the DOM is to use a browser inspector (F
 
 ## Handy custom sensors for use with ring-tiles
 
-I have made a few custom sensors to help with certain `ring-tile` use cases. Fair warning: there might be better ways to do these things, but here is how I did it.
+I have made a few custom sensors to help with certain `ring-tile` use cases. Fair warning: there might be better ways to do these things, but this is how I did it.
 
 ### Pressure 6 hours ago
 
