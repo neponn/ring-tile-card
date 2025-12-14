@@ -94,7 +94,7 @@ cards:
       width: 60
     cards:
       - type: custom:ring-tile
-        entity: sensor.inside_temperature
+        entity: sensor.temperature_lounge
         ring_size: 2
         ring_only: true
         bottom_element: name
