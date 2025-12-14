@@ -81,6 +81,53 @@ Important to note that the `tweaks` method only supports static styling; if you 
 
 Note: `colour` may also be spelled `color`.
 
+`rt-ring-svg-size` and `transparent_tile` can be used in combination with other layout cards to build highly customised tiles. For example:
+
+<img src="img/ad-custom-layout.png" width="250px">
+
+```yaml
+type: custom:vertical-stack-in-card
+cards:
+  - type: custom:layout-card
+    layout_type: custom:horizontal-layout
+    layout:
+      width: 60
+    cards:
+      - type: custom:ring-tile
+        entity: sensor.inside_temperature
+        ring_size: 2
+        ring_only: true
+        bottom_element: name
+        min_sig_figs: 3
+        name: Lounge
+        tweaks:
+          transparent_tile: true
+          rt-ring-svg-size: 60px
+      - type: custom:ring-tile
+        entity: sensor.temperature_study
+        ring_size: 2
+        ring_only: true
+        bottom_element: name
+        name: Study
+        min_sig_figs: 3
+        tweaks:
+          transparent_tile: true
+          rt-ring-svg-size: 60px
+      - type: custom:ring-tile
+        entity: sensor.temperature_tv_room
+        ring_size: 2
+        ring_only: true
+        bottom_element: name
+        name: Media
+        min_sig_figs: 3
+        tweaks:
+          transparent_tile: true
+          rt-ring-svg-size: 60px
+grid_options:
+  columns: 6
+  rows: 2
+```
+
 ### Home Assistant friendly colours
 
 Note that [colour shortcuts](config.md/#home-assistant-friendly-colour-shortcuts) provided by `ring-tile` **do not** work with `card_mod`. You can achieve a similar result using Home Assistant built in CSS colour variables, [see below](#ha-friendly-colour-alternatives). Colour shortcuts **do** work with `tweaks` options, however.
