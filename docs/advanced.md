@@ -238,7 +238,7 @@ Home assistant comes with a bunch of CSS colour variables, which you can use in 
 
 - ![#bdbdbd](https://placehold.co/15x15/bdbdbd/bdbdbd.png) / ![#6f6f6f](https://placehold.co/15x15/6f6f6f/6f6f6f.png) `--disabled-color:` `#bdbdbd` / `#6f6f6f` (Adapts to light / dark)
 
-- ![#ffffff](https://placehold.co/15x15/ffffff/ffffff.png) / ![#1c1c1c](https://placehold.co/15x15/1c1c1c/1c1c1c.png) `--card-background-color:` `#ffffff` / `#1c1c1c` (Adapts to light / dark)
+- ![#ffffff](img/white-swatch.svg) / ![#1c1c1c](https://placehold.co/15x15/1c1c1c/1c1c1c.png) `--card-background-color:` `#ffffff` / `#1c1c1c` (Adapts to light / dark)
 
 - ![#44739e](https://placehold.co/15x15/44739e/44739e.png) `--state-icon-color:` `#44739e`
 
