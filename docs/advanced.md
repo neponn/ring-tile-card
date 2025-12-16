@@ -90,12 +90,9 @@ Note: `colour` may also be spelled `color`.
 <summary>Config:</summary>
 
 ```yaml
-type: custom:vertical-stack-in-card
+type: custom:stack-in-card
 cards:
-  - type: custom:layout-card
-    layout_type: custom:horizontal-layout
-    layout:
-      width: 60
+  - type: horizontal-stack
     cards:
       - type: custom:ring-tile
         entity: sensor.temperature_lounge
@@ -116,7 +113,7 @@ cards:
           transparent_tile: true
           rt-ring-svg-size: 60px
       - type: custom:ring-tile
-        entity: sensor.media
+        entity: sensor.temperature_media
         ring_size: 2
         ring_only: true
         bottom_element: name
@@ -126,7 +123,7 @@ cards:
           rt-ring-svg-size: 60px
 grid_options:
   columns: 6
-  rows: 2
+  rows: 1.4
 ```
 
 </details>
@@ -238,7 +235,7 @@ Home assistant comes with a bunch of CSS colour variables, which you can use in 
 
 - ![#bdbdbd](https://placehold.co/15x15/bdbdbd/bdbdbd.png) / ![#6f6f6f](https://placehold.co/15x15/6f6f6f/6f6f6f.png) `--disabled-color:` `#bdbdbd` / `#6f6f6f` (Adapts to light / dark)
 
-- ![#ffffff](img/white-swatch.svg) / ![#1c1c1c](https://placehold.co/15x15/1c1c1c/1c1c1c.png) `--card-background-color:` `#ffffff` / `#1c1c1c` (Adapts to light / dark)
+- ![#ffffff](img/ad-white-swatch.svg) / ![#1c1c1c](https://placehold.co/15x15/1c1c1c/1c1c1c.png) `--card-background-color:` `#ffffff` / `#1c1c1c` (Adapts to light / dark)
 
 - ![#44739e](https://placehold.co/15x15/44739e/44739e.png) `--state-icon-color:` `#44739e`
 
