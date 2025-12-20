@@ -374,7 +374,7 @@ export class RtRingSvg extends LitElement {
       isNumber(this.marker_value) && !this._noState
         ? this.renderMarker(
             this.marker_value,
-            this.marker_colour,
+            `var(--rt-marker-color, var(--rt-marker-colour, ${this.marker_colour}))`,
             this.compass_marker
           )
         : nothing;
@@ -382,7 +382,7 @@ export class RtRingSvg extends LitElement {
       isNumber(this.marker2_value) && !this._noState
         ? this.renderMarker(
             this.marker2_value,
-            this.marker2_colour,
+            `var(--rt-marker2-color, var(--rt-marker2-colour, ${this.marker2_colour}))`,
             this.compass_marker2
           )
         : nothing;
@@ -432,7 +432,7 @@ export class RtRingSvg extends LitElement {
       overflow: visible;
     }
     text {
-      font-family: Geist, var(--ha-font-family-body);
+      font-family: var(--rt-font-family, Geist), var(--ha-font-family-body);
       font-optical-sizing: auto;
       font-style: normal;
       color: var(--primary-text-color);
@@ -474,8 +474,23 @@ export class RtRingSvg extends LitElement {
       stroke: var(--primary-text-color, #212121);
     }
     .pointer {
-      stroke: var(--rt-pointer-colour, orange);
-      fill: var(--rt-pointer-colour, orange);
+      stroke: var(
+        --rt-pointer-color,
+        var(
+          --rt-pointer-colour,
+          color-mix(in srgb, orange 90%, var(--primary-text-color))
+        )
+      );
+      fill: var(
+        --rt-pointer-color,
+        var(
+          --rt-pointer-colour,
+          color-mix(in srgb, orange 90%, var(--primary-text-color))
+        )
+      );
+    }
+    .pointer-centre {
+      fill: #444444;
     }
   `;
 }

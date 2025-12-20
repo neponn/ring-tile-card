@@ -1,32 +1,15 @@
-import { LitElement, html, css, nothing, svg } from "lit";
+import { LitElement, html, css } from "lit";
 
 export class RtRing extends LitElement {
   static get properties() {
     return {
-      interactive: {},
-      imageStyle: {},
-      imageUrl: {},
+      interactive: { reflect: true, type: Boolean },
       ring_size: {},
     };
   }
   render() {
-    if (this.imageUrl) {
-      const imageStyle = this.imageStyle || DEFAULT_TILE_ICON_BORDER_STYLE;
-      return html`
-        <div class="container ${classMap({ [imageStyle]: this.imageUrl })}">
-          <img alt="" src=${this.imageUrl} />
-        </div>
-        <slot></slot>
-      `;
-    }
-
     return html`
-      <div
-        class="container size_${this.ring_size} ${this
-          .interactive
-          ? "background"
-          : ""}"
-      >
+      <div class="container size_${this.ring_size} }">
         <slot name="icon"></slot>
       </div>
       <slot></slot>
@@ -44,7 +27,7 @@ export class RtRing extends LitElement {
       transition: transform 180ms ease-in-out;
     }
     :host([interactive]:active) {
-      transform: scale(1.2);
+      transform: scale(1.1);
     }
     :host([interactive]:hover) {
       --tile-icon-opacity: var(--tile-icon-hover-opacity);
@@ -54,8 +37,6 @@ export class RtRing extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
-      // width: 36px;
-      // height: 36px;
       border-radius: 18px;
       overflow: visible;
       transition: box-shadow 180ms ease-in-out;
@@ -69,27 +50,11 @@ export class RtRing extends LitElement {
     .container.square {
       border-radius: 0;
     }
-    .container.background::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      background-color: var(--tile-icon-color);
-      transition: background-color 180ms ease-in-out, opacity 180ms ease-in-out;
-      opacity: var(--tile-icon-opacity);
-    }
     .container ::slotted([slot="icon"]) {
       display: flex;
       color: var(--tile-icon-color);
       transition: color 180ms ease-in-out;
       pointer-events: none;
-    }
-    .container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
   `;
 }

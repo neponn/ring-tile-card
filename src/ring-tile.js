@@ -1,8 +1,9 @@
 import { LitElement, html, css, nothing } from "lit";
 import { classMap } from "lit/directives/class-map";
+import { styleMap } from "lit/directives/style-map";
 import { ifDefined } from "lit/directives/if-defined";
 
-import { mdiExclamationThick, RT, US_SPELLINGS } from "./const.js";
+import { HA_COLOURS, mdiExclamationThick, RT, US_SPELLINGS } from "./const.js";
 import {
   DEFAULTS,
   SPECIFIC_DEFAULTS,
@@ -223,14 +224,31 @@ export class RingTile extends LitElement {
       large: this._config.ring_size > 1,
       small: this._config.ring_size === 1,
     };
-    const cardClasses = { "transparent-tile": this.transparent_tile };
+
     const icon =
       this._config.icon ||
       this._displayStateObj.attributes["icon"] ||
       this._config.default_icon;
 
+    // Any style tweaks?
+    const cardClasses = {
+      "transparent-tile": this._config.tweaks?.transparent_tile || false,
+    };
+    let styles = {};
+    if (this._config.tweaks) {
+      const tweaks = this._config.tweaks;
+      Object.keys(tweaks).forEach((key) => {
+        if (key.slice(0, 3) === "rt-") {
+          styles[`--${key}`] = HA_COLOURS[tweaks[key]] || tweaks[key];
+        }
+      });
+    }
+
     const renderString = html`
-      <ha-card class="active type-tile ${classMap(cardClasses)}">
+      <ha-card
+        class="active ${classMap(cardClasses)}"
+        style=${styleMap(styles)}
+      >
         <div
           class="background"
           @pointerdown=${(ev) => this._onPointerDown(ev, "card")}
@@ -248,8 +266,7 @@ export class RingTile extends LitElement {
             <rt-ring
               role=${ifDefined(this._hasIconAction ? "button" : undefined)}
               tabindex=${ifDefined(this._hasIconAction ? "0" : undefined)}
-              data-domain="sensor"
-              data-state=${stateStr}
+              .interactive=${this._hasIconAction}
               ring_size=${this._config.ring_size}
               @pointerdown=${ifDefined(
                 this._hasIconAction
@@ -273,7 +290,8 @@ export class RingTile extends LitElement {
               )}
             >
               <rt-ring-svg
-                style="width:${ringPixels}px;height:${ringPixels}px;"
+                style="width: var(--rt-ring-svg-size, ${ringPixels}px);
+                  height: var(--rt-ring-svg-size, ${ringPixels}px);"
                 slot="icon"
                 ring_type=${this._config.ring_type}
                 ring_size=${this._config.ring_size}
@@ -527,15 +545,11 @@ export class RingTile extends LitElement {
   }
 
   getGridOptions() {
-    let columns = 6;
-    if (this._config.ring_only) {
-      if (this._config.transparent_tile) {
-        columns = 1.6;
-      } else {
-        columns = 2 * this._config.ring_size;
-      }
+    let columns = this._config.tweaks?.tile_columns || 6;
+    if (this._config.ring_only && !this._config.tweaks?.tile_columns) {
+      columns = 2 * this._config.ring_size;
     }
-    const rows = this._config.ring_size;
+    const rows = this._config.tweaks?.tile_rows || this._config.ring_size;
     return {
       columns,
       rows: rows,
@@ -616,8 +630,6 @@ export class RingTile extends LitElement {
       overflow: hidden;
     }
     .content.centred {
-      /* margin: auto;
-      padding: 0; */
       justify-content: center;
     }
     .content.large {

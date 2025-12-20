@@ -2,7 +2,7 @@
 
 # Advanced configuration
 
-`ring-tile` doesn't support templating. To avoid too much configuration complexity, `ring-tile` has been designed to work well with [`card-mod`](https://github.com/thomasloven/lovelace-card-mod), which supports templating very well. 
+`ring-tile` doesn't support templating. To avoid complexity, `ring-tile` has been designed to work well with [`card-mod`](https://github.com/thomasloven/lovelace-card-mod), which supports templating very well. 
 
 If you haven't used it before, `card-mod` is an awesome plugin that enables you to dynamically manipulate the styling of any Home Assistant card. Make sure you are familiar with it before reading on.
 
@@ -10,7 +10,7 @@ There are two ways in which `ring-tile` has been designed for `card-mod` use: [o
 
 ## Overriding CSS colour variables
 
-Best to start with an example.
+Best to start with an example. First, an example of **dynamic** styling. This example makes use of `card_mod` to set a CSS variable based on the state of an entity by using a template.
 
 <img src="img/ad-battery-charging.png" width="250">
 
@@ -20,7 +20,7 @@ entity: sensor.iphone_battery_level
 card_mod:
   style: |
     * {
-      --rt-icon-color: {{ 
+      --rt-icon-colour: {{ 
           "darkorange" 
           if states("sensor.iphone_battery_state") == "Charging"
           else "var(--)" 
@@ -28,9 +28,9 @@ card_mod:
     }
 ```
 
-In this example, the colour of the icon is changed to `darkorange` if the iPhone battery is charging (default colour if not). This is achieved by using a `card-mod` style template to dynamically update the `--rt-icon-color` CSS variable.
+In this example, the colour of the icon is changed to `darkorange` if the iPhone battery is charging (default colour if not). This is achieved by using a `card_mod` style template to dynamically update the `--rt-icon-colour` CSS variable.
 
-Another example: you can statically change the opacity of the ring background.
+Another example: you can **statically** change the opacity of the ring background.
 
 <img src="img/ad-ring-background.png" width="250">
 
@@ -45,23 +45,93 @@ card_mod:
     }
 ```
 
+For static styling you can alternatively use the `tweaks` config option:
+
+```yaml
+type: custom:ring-tile
+entity: sensor.humidity
+ring_size: 2
+tweaks:
+  rt-ring-background-opacity: 20%
+```
+
+Important to note that the `tweaks` method only supports static styling; if you want to style something dynamically (with a template), you'll need to use the `card_mod` option.
+
 ### CSS variables available
 
-`ring-tile` offers the following CSS variables:
+`ring-tile` exposes a bunch of CSS variables that you can manipulate. As described above, you can use these either with `card_mod` (use the CSS variable), or &mdash; for static styling &mdash; via the `tweaks` config option. There are also a few inbuilt `tweaks` options that take care of common CSS styling jobs.
 
-| CSS variable | Purpose | Type | Default |
-|--------------|---------|------|---------|
-| `--rt-icon-color` | Override icon colour | CSS colour code | `ha_blue` middle and bottom positions; `ha_grey` top |
-| `--rt-top-icon-opacity` | Icon opacity when rendered in top position | `0%`-`100%` | `50%` |
-| `--rt-ring-background-opacity` | Opacity used for the ring background  | `0%`-`100%` | depends on ring |
-| `--rt-background-text-opacity` | Text opacity used for top, bottom and units | `0`-`1` | `0.6` |
-| `--rt-scale-text-opacity` | Text opacity used for scale labels | `0`-`1` | `0.5` |
-| `--rt-pointer-colour` | Override the `pointer` colour | CSS colour code | `orange` |
-| `--card-mod-icon` | Override the configured icon (`card_mod` [feature](https://github.com/thomasloven/lovelace-card-mod#changing-icons)) | HA icon code (eg `mdi:eye`) | per config |
+| CSS variable | `tweaks` option | Purpose | Type | Default |
+|--------------|-----------------|---------|------|---------|
+| `--rt-icon-colour` | `rt-icon-colour` | Override icon colour | CSS colour code | `ha_blue` middle and bottom positions; `ha_grey` top |
+| `--card-mod-icon` | N/A | Override the configured icon for dynamic styling (`card_mod` [feature](https://github.com/thomasloven/lovelace-card-mod#changing-icons)). Use the `icon` config option for static cases | HA icon code (eg `mdi:eye`) | per config |
+| `--rt-top-icon-opacity` | `rt-top-icon-opacity` | Icon opacity when rendered in top position | `0%`-`100%` | `50%` |
+| `--rt-ring-colour` | `rt-ring-colour` | Override the ring colour (most useful for dynamic styling) | CSS colour code | As configured in `colours` config option |
+| `--rt-ring-background-opacity` | `rt-ring-background-opacity` | Opacity used for the ring background  | `0%`-`100%` | depends on ring |
+| `--rt-pointer-colour` | `rt-pointer-colour` | Override the `pointer` colour | CSS colour code | `orange` |
+| `--rt-marker-colour` | `rt-marker-colour` | Override the `marker` colour | CSS colour code | grey |
+| `--rt-marker2-colour` | `rt-marker2-colour` | Override the `marker2` colour | CSS colour code | light grey |
+| `--rt-background-text-opacity` | `rt-background-text-opacity` | Text opacity used for top, bottom and units | `0`-`1` | `0.6` |
+| `--rt-scale-text-opacity` | `rt-scale-text-opacity` | Text opacity used for scale labels | `0`-`1` | `0.5` |
+| `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | Geist |
+| `--rt-ring-svg-size` | `rt-ring-svg-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
+| N/A | `transparent_tile` | No background and no border | Boolean | `False` |
+| N/A | `tile_rows` | Customise the total height of the `ring-tile` card | `1.0`-`6.0`, card layout row units | `ring_size` row units |
+| N/A | `tile_columns` | Customise the total width of the `ring-tile` card | `1.5`-`12.0`, card layout column units | 6 column units |
+
+Note: `colour` may also be spelled `color`.
+
+`rt-ring-svg-size`, `transparent_tile`, `tile_rows` and `tile_columns` can be used in combination with other layout cards to build highly customised tiles. For example:
+
+<img src="img/ad-custom-layout.png" width="250px">
+
+<details>
+
+<summary>Config:</summary>
+
+```yaml
+type: custom:stack-in-card
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: custom:ring-tile
+        entity: sensor.temperature_lounge
+        ring_size: 2
+        ring_only: true
+        bottom_element: name
+        min_sig_figs: 3
+        tweaks:
+          transparent_tile: true
+          rt-ring-svg-size: 60px
+      - type: custom:ring-tile
+        entity: sensor.temperature_study
+        ring_size: 2
+        ring_only: true
+        bottom_element: name
+        min_sig_figs: 3
+        tweaks:
+          transparent_tile: true
+          rt-ring-svg-size: 60px
+      - type: custom:ring-tile
+        entity: sensor.temperature_media
+        ring_size: 2
+        ring_only: true
+        bottom_element: name
+        min_sig_figs: 3
+        tweaks:
+          transparent_tile: true
+          rt-ring-svg-size: 60px
+grid_options:
+  columns: 6
+  rows: 1.4
+```
+
+</details>
+
 
 ### Home Assistant friendly colours
 
-Note that [colour shortcuts](config.md/#home-assistant-friendly-colour-shortcuts) provided by `ring-tile` **do not** work with `card_mod`. You can achieve a similar result using Home Assistant built in CSS colour variables, [see below](#ha-friendly-colour-alternatives).
+Note that [colour shortcuts](config.md/#home-assistant-friendly-colour-shortcuts) provided by `ring-tile` **do not** work with `card_mod`. You can achieve a similar result using Home Assistant built in CSS colour variables, [see below](#ha-friendly-colour-alternatives). Colour shortcuts **do** work with `tweaks` options, however.
 
 ## Manipulating ring-tile HTML / SVG elements
 
@@ -96,8 +166,7 @@ card_mod:
 * The top level element is `ring-tile`
 * Ring elements live in a shadow-root inside `rt-ring-svg`
   * To access ring elements, use `rt-ring-svg $: |` before selecting the targeted elements (like in the example above)
-* Icons are rendered as HTML, top level `ha-state-icon` (a Home Assistant component, which actually renders the icon as SVG in the end)
-* All other elements are rendered as SVG, split into three groups, with class names assigned as follows:
+* All elements are rendered as SVG, split into three groups, with class names assigned as follows:
   * `elements`: these are the `top` / `middle` / `bottom` elements
   * `ring`: the ring itself, plus an optional `scale` group, containing:
     * `ticks` and `labels` groups
@@ -111,7 +180,7 @@ The easiest way to find your way around the DOM is to use a browser inspector (F
 
 ## Handy custom sensors for use with ring-tiles
 
-I have made a few custom sensors to help with certain `ring-tile` use cases. Fair warning: there might be better ways to do these things, but here is how I did it.
+I have made a few custom sensors to help with certain `ring-tile` use cases. Fair warning: there might be better ways to do these things, but this is how I did it.
 
 ### Pressure 6 hours ago
 
@@ -160,49 +229,49 @@ sensor:
 
 Home assistant comes with a bunch of CSS colour variables, which you can use in your `card_mod` styles to match the HA aesthetic:
 
-- ![#212121](https://placehold.co/15x15/212121/212121.png) `--primary-text-color: #212121;` (Adapts to dark / light)
+- ![#212121](https://placehold.co/15x15/212121/212121.png) / ![#e1e1e1](https://placehold.co/15x15/e1e1e1/e1e1e1.png) `--primary-text-color:` `#212121` / `#e1e1e1` (Adapts to light / dark)
 
-- ![#727272](https://placehold.co/15x15/727272/727272.png) `--secondary-text-color: #727272;` (Adapts to dark / light)
+- ![#727272](https://placehold.co/15x15/727272/727272.png) / ![#9b9b9b](https://placehold.co/15x15/9b9b9b/9b9b9b.png) `--secondary-text-color:` `#727272` / `9b9b9b` (Adapts to light / dark)
 
-- ![#bdbdbd](https://placehold.co/15x15/bdbdbd/bdbdbd.png) `--disabled-color: #bdbdbd;` (Adapts to dark / light)
+- ![#bdbdbd](https://placehold.co/15x15/bdbdbd/bdbdbd.png) / ![#6f6f6f](https://placehold.co/15x15/6f6f6f/6f6f6f.png) `--disabled-color:` `#bdbdbd` / `#6f6f6f` (Adapts to light / dark)
 
-- ![#ffffff](https://placehold.co/15x15/ffffff/ffffff.png) `--card-background-color: #ffffff;` (Adapts to dark / light)
+- ![#ffffff](img/ad-white-swatch.svg) / ![#1c1c1c](https://placehold.co/15x15/1c1c1c/1c1c1c.png) `--card-background-color:` `#ffffff` / `#1c1c1c` (Adapts to light / dark)
 
-- ![#44739e](https://placehold.co/15x15/44739e/44739e.png) `--state-icon-color: #44739e;`
+- ![#44739e](https://placehold.co/15x15/44739e/44739e.png) `--state-icon-color:` `#44739e`
 
-- ![#f44336](https://placehold.co/15x15/f44336/f44336.png) `--red-color: #f44336;`
+- ![#f44336](https://placehold.co/15x15/f44336/f44336.png) `--red-color:` `#f44336`
 
-- ![#e91e63](https://placehold.co/15x15/e91e63/e91e63.png) `--pink-color: #e91e63;`
+- ![#e91e63](https://placehold.co/15x15/e91e63/e91e63.png) `--pink-color:` `#e91e63`
 
-- ![#926bc7](https://placehold.co/15x15/926bc7/926bc7.png) `--purple-color: #926bc7;`
+- ![#926bc7](https://placehold.co/15x15/926bc7/926bc7.png) `--purple-color:` `#926bc7`
 
-- ![#926bc7](https://placehold.co/15x15/926bc7/926bc7.png) `--deep-purple-color: #926bc7;`
+- ![#926bc7](https://placehold.co/15x15/926bc7/926bc7.png) `--deep-purple-color:` `#926bc7`
 
-- ![#3f51b5](https://placehold.co/15x15/3f51b5/3f51b5.png) `--indigo-color: #3f51b5;`
+- ![#3f51b5](https://placehold.co/15x15/3f51b5/3f51b5.png) `--indigo-color:` `#3f51b5`
 
-- ![#2196f3](https://placehold.co/15x15/2196f3/2196f3.png) `--blue-color: #2196f3;`
+- ![#2196f3](https://placehold.co/15x15/2196f3/2196f3.png) `--blue-color:` `#2196f3`
 
-- ![#03a9f4](https://placehold.co/15x15/03a9f4/03a9f4.png) `--light-blue-color: #03a9f4;`
+- ![#03a9f4](https://placehold.co/15x15/03a9f4/03a9f4.png) `--light-blue-color:` `#03a9f4`
 
-- ![#00bcd4](https://placehold.co/15x15/00bcd4/00bcd4.png) `--cyan-color: #00bcd4;`
+- ![#00bcd4](https://placehold.co/15x15/00bcd4/00bcd4.png) `--cyan-color:` `#00bcd4`
 
-- ![#009688](https://placehold.co/15x15/009688/009688.png) `--teal-color: #009688;`
+- ![#009688](https://placehold.co/15x15/009688/009688.png) `--teal-color:` `#009688`
 
-- ![#4caf50](https://placehold.co/15x15/4caf50/4caf50.png) `--green-color: #4caf50;`
+- ![#4caf50](https://placehold.co/15x15/4caf50/4caf50.png) `--green-color:` `#4caf50`
 
-- ![#8bc34a](https://placehold.co/15x15/8bc34a/8bc34a.png) `--light-green-color: #8bc34a;`
+- ![#8bc34a](https://placehold.co/15x15/8bc34a/8bc34a.png) `--light-green-color:` `#8bc34a`
 
-- ![#cddc39](https://placehold.co/15x15/cddc39/cddc39.png) `--lime-color: #cddc39;`
+- ![#cddc39](https://placehold.co/15x15/cddc39/cddc39.png) `--lime-color:` `#cddc39`
 
-- ![#ffeb3b](https://placehold.co/15x15/ffeb3b/ffeb3b.png) `--yellow-color: #ffeb3b;`
+- ![#ffeb3b](https://placehold.co/15x15/ffeb3b/ffeb3b.png) `--yellow-color:` `#ffeb3b`
 
-- ![#ff9800](https://placehold.co/15x15/ff9800/ff9800.png) `--amber-color: #ff9800;`
+- ![#ff9800](https://placehold.co/15x15/ff9800/ff9800.png) `--amber-color:` `#ff9800`
 
-- ![#ff9800](https://placehold.co/15x15/ff9800/ff9800.png) `--orange-color: #ff9800;`
+- ![#ff9800](https://placehold.co/15x15/ff9800/ff9800.png) `--orange-color:` `#ff9800`
 
-- ![#ff6f22](https://placehold.co/15x15/ff6f22/ff6f22.png) `--deep-orange-color: #ff6f22;`
+- ![#ff6f22](https://placehold.co/15x15/ff6f22/ff6f22.png) `--deep-orange-color:` `#ff6f22`
 
-- ![#795548](https://placehold.co/15x15/795548/795548.png) `--brown-color: #795548;`
+- ![#795548](https://placehold.co/15x15/795548/795548.png) `--brown-color:` `#795548`
 
 **Note!** Home Assistant devs may change these at any time!
 
