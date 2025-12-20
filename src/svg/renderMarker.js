@@ -41,8 +41,8 @@ export function extendWithRenderMarker(RtRingSvg) {
         this.indicator === IND.DOT
           ? 0
           : this.ring_size <= 2
-          ? width / 5
-          : width / 8;
+          ? width / 2.5
+          : width / 4;
 
       if (this.ring_type === RT.CLOSED) {
         degrees = (degrees + 180) % 360;
@@ -101,25 +101,34 @@ export function extendWithRenderMarker(RtRingSvg) {
           ? 180
           : 0;
 
-      return svg`
-        <g class=${className} transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
-          <path
-            d=${triangle}
-            fill=${markerColour}
-            stroke="var(--card-background-color, white)"
-            stroke-linejoin="bevel"
-            stroke-width=${strokeWidth}
-            transform="rotate(${pointIn} ${MID_BOX} ${
-        VIEW_BOX - width + (0.5 * width) / 3
-      })"
-          />
-        </g>`;
+      return {
+        object: svg`
+          <g class=${className} transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
+            <path
+              d=${triangle}
+              fill=${markerColour}
+              transform="rotate(${pointIn} ${MID_BOX} 
+                ${VIEW_BOX - width + (0.5 * width) / 3})"
+            />
+          </g>`,
+        mask: svg`
+          <g transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
+            <path
+              d=${triangle}
+              stroke-linejoin="round"
+              stroke-width=${strokeWidth}
+              transform="rotate(${pointIn} ${MID_BOX} 
+                ${VIEW_BOX - width + (0.5 * width) / 3})"
+            />
+          </g>`,
+      };
     } else {
       // render pointer markers
       const p1 = [MID_BOX, MID_BOX];
       const p2 = getCoordFromDegrees(degrees, MID_BOX - width * 0.75, VIEW_BOX);
       const strokeWidth = [2, 1.6, 1.4, 1.3, 1.2, 1.1][this.ring_size - 1];
-      return svg`
+      return {
+        object: svg`
           <g class=${className}>
             <line
               x1=${p1[0]} y1=${p1[1]}
@@ -129,7 +138,8 @@ export function extendWithRenderMarker(RtRingSvg) {
               stroke-width=${strokeWidth}
             />
           </g>
-        `;
+        `,
+      };
     }
   };
 }

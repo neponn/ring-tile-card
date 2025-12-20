@@ -325,43 +325,6 @@ export class RtRingSvg extends LitElement {
       ringBackgroundOpacity = 0.15;
     }
 
-    // render the ring
-    let ringBackground;
-    if (this.ring_type === RT.NONE) {
-      ringBackground = nothing;
-    } else if (this.ring_type.startsWith(RT.COMPASS)) {
-      ringBackground = this.renderCompass();
-    } else {
-      ringBackground = this.renderGradRing(
-        this._startDegrees,
-        this._endDegrees,
-        ringBackgroundOpacity
-      );
-    }
-
-    // render the indicator
-    let indicatorBottom = nothing;
-    let indicatorTop = nothing;
-    if (this.ring_type !== RT.NONE && !this._noState) {
-      switch (this.indicator) {
-        case IND.ARC:
-          indicatorBottom = this.renderSolidRing(
-            this._startDegrees,
-            statePoint,
-            this.state.value
-          );
-          break;
-        case IND.DOT:
-          indicatorBottom = this.renderDot(statePoint, this.state.value);
-          break;
-        case IND.POINTER:
-          indicatorTop = this.renderPointer(statePoint);
-          break;
-        case IND.NONE:
-          break;
-      }
-    }
-
     // render the scale
     let scale = nothing;
     if (this.scale !== SCALE.NONE) {
@@ -387,6 +350,45 @@ export class RtRingSvg extends LitElement {
           )
         : nothing;
 
+    // render the indicator
+    let indicatorBottom = nothing;
+    let indicatorTop = nothing;
+    if (this.ring_type !== RT.NONE && !this._noState) {
+      switch (this.indicator) {
+        case IND.ARC:
+          indicatorBottom = this.renderSolidRing(
+            this._startDegrees,
+            statePoint,
+            this.state.value,
+            [marker.mask, marker2.mask]
+          );
+          break;
+        case IND.DOT:
+          indicatorBottom = this.renderDot(statePoint, this.state.value);
+          break;
+        case IND.POINTER:
+          indicatorTop = this.renderPointer(statePoint);
+          break;
+        case IND.NONE:
+          break;
+      }
+    }
+
+    // render the ring
+    let ringBackground;
+    if (this.ring_type === RT.NONE) {
+      ringBackground = nothing;
+    } else if (this.ring_type.startsWith(RT.COMPASS)) {
+      ringBackground = this.renderCompass();
+    } else {
+      ringBackground = this.renderGradRing(
+        this._startDegrees,
+        this._endDegrees,
+        ringBackgroundOpacity,
+        [indicatorBottom.mask, marker.mask, marker2.mask]
+      ).object;
+    }
+
     // render the top, middle and bottom elements
     const topElementSvg = this.getTopElementSvg();
     const middleElementSvg = this.getMiddleElementSvg();
@@ -407,7 +409,8 @@ export class RtRingSvg extends LitElement {
         </g>
         <g class="ring">${ringBackground} ${scale}</g>
         <g class="indicators">
-          ${indicatorBottom} ${marker2} ${marker} ${indicatorTop}
+          ${indicatorBottom.object} ${marker2.object} ${marker.object}
+          ${indicatorTop.object}
         </g>
       </svg>
     `;
