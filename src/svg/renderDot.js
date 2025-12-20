@@ -1,5 +1,5 @@
 import { svg } from "lit";
-import { MID_BOX, RT, VIEW_BOX } from "../const";
+import { VIEW_BOX } from "../const";
 import { getRingPath } from "./getRingPath";
 import { getCoordFromDegrees } from "../helpers/utilities";
 
@@ -12,6 +12,13 @@ export function extendWithRenderDot(RtRingSvg) {
       width * [0.55, 0.4, 0.35, 0.35, 0.35, 0.35][this.ring_size - 1];
     const dotRadius = width / 2 + dotOutline * 0.7;
 
+    const ringClipSegment = getRingPath(
+      degrees - 10,
+      degrees + 10,
+      this._outerRadius + width * 0.05,
+      width * 1.1
+    );
+
     return {
       object: svg`
         <g class="indicator">
@@ -20,18 +27,17 @@ export function extendWithRenderDot(RtRingSvg) {
             cx=${dotCoord[0]} cy=${dotCoord[1]} 
             r=${dotRadius - dotOutline / 2}
             fill=${this._grad.getSolidColour(rawValue)}
-            transform="rotate(${
-              this.ring_type === RT.CLOSED ? 180 : 0
-            } ${MID_BOX} ${MID_BOX})"
           />
         </g>`,
       mask: svg`
+        <clipPath id="dot-clip">
+          <path d=${ringClipSegment}
+          />
+        </clipPath>
         <circle 
           cx=${dotCoord[0]} cy=${dotCoord[1]} 
           r=${dotRadius + dotOutline / 2}
-          transform="rotate(${
-            this.ring_type === RT.CLOSED ? 180 : 0
-          } ${MID_BOX} ${MID_BOX})"
+          clip-path="url(#dot-clip)"
         />      
       `,
     };

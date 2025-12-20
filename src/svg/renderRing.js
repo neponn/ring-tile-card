@@ -17,20 +17,15 @@ export function extendWithRenderRings(RtRingSvg) {
     const id = opacity.toString().replace(".", "");
     return {
       object: svg`
-        <g class="ring-grad" transform="rotate(${
-            this.ring_type === RT.CLOSED ? 180 : 0
-          } ${MID_BOX} ${MID_BOX})"
-        >
+        <g class="ring-grad">
           <clipPath id="ring-clip-${id}">
             <path
               d=${segment}
             />
           </clipPath>
-          <mask id="cut-outs">
+          <mask id="cut-outs-ring-grad">
             <rect width=${VIEW_BOX} height=${VIEW_BOX} fill="white" />
-            <g fill="black" stroke="black" stroke-width="0" transform="rotate(${
-              this.ring_type === RT.CLOSED ? 180 : 0
-            } ${MID_BOX} ${MID_BOX})">
+            <g fill="black" stroke="black" stroke-width="0">
               ${cutOuts}
             </g>
           </mask>
@@ -38,7 +33,7 @@ export function extendWithRenderRings(RtRingSvg) {
             x="0" y="0"
             width=${VIEW_BOX} height=${VIEW_BOX}
             clip-path="url(#ring-clip-${id})"
-            mask="url(#cut-outs)"
+            mask="url(#cut-outs-ring-grad)"
           >
             <div
               xmlns="http://www.w3.org/1999/xhtml"
@@ -61,18 +56,15 @@ export function extendWithRenderRings(RtRingSvg) {
 
     return {
       object: svg`
-        <g class="ring-solid" transform="rotate(${
-            this.ring_type === RT.CLOSED ? 180 : 0
-          } ${MID_BOX} ${MID_BOX})"
-        >
-          <mask id="cut-outs">
+        <g class="ring-solid">
+          <mask id="cut-outs-ring-solid">
             <rect width=${VIEW_BOX} height=${VIEW_BOX} fill="white" />
             <g fill="black" stroke="black" stroke-width="0">
               ${cutOuts}
             </g>
           </mask>
           <path 
-            mask="url(#cut-outs)"
+            mask="url(#cut-outs-ring-solid)"
             d=${segment}
             fill=${this._grad.getSolidColour(rawValue)}
             stroke-width="0"

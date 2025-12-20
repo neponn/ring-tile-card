@@ -21,6 +21,7 @@ import {
   TE,
   ME,
   IND,
+  MID_BOX,
 } from "./const.js";
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
 
@@ -325,13 +326,6 @@ export class RtRingSvg extends LitElement {
       ringBackgroundOpacity = 0.15;
     }
 
-    // render the scale
-    let scale = nothing;
-    if (this.scale !== SCALE.NONE) {
-      const scaleOpacity = this.indicator === IND.POINTER ? 0.7 : 0.2;
-      scale = this.renderScale(scaleOpacity);
-    }
-
     // render the markers
     const marker =
       isNumber(this.marker_value) && !this._noState
@@ -374,6 +368,17 @@ export class RtRingSvg extends LitElement {
       }
     }
 
+    // render the scale
+    let scale = nothing;
+    if (this.scale !== SCALE.NONE) {
+      const scaleOpacity = this.indicator === IND.POINTER ? 0.7 : 0.2;
+      scale = this.renderScale(scaleOpacity, [
+        indicatorBottom.mask,
+        marker.mask,
+        marker2.mask,
+      ]);
+    }
+
     // render the ring
     let ringBackground;
     if (this.ring_type === RT.NONE) {
@@ -407,8 +412,19 @@ export class RtRingSvg extends LitElement {
           ${topElementSvg} ${middleElementSvg} ${bottomElementSvg}
           ${this._iconSvg}
         </g>
-        <g class="ring">${ringBackground} ${scale}</g>
-        <g class="indicators">
+        <g
+          class="ring"
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180 : 0} 
+            ${MID_BOX} ${MID_BOX})"
+        >
+          ${ringBackground}
+        </g>
+        ${scale}
+        <g
+          class="indicators"
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180: 0} 
+            ${MID_BOX} ${MID_BOX})"
+        >
           ${indicatorBottom.object} ${marker2.object} ${marker.object}
           ${indicatorTop.object}
         </g>

@@ -43,10 +43,6 @@ export function extendWithRenderMarker(RtRingSvg) {
           : this.ring_size <= 2
           ? width / 2.5
           : width / 4;
-
-      if (this.ring_type === RT.CLOSED) {
-        degrees = (degrees + 180) % 360;
-      }
     }
 
     // TODO: Add support for this.outerRadius
@@ -103,7 +99,9 @@ export function extendWithRenderMarker(RtRingSvg) {
 
       return {
         object: svg`
-          <g class=${className} transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
+          <g class=${className} 
+            transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})"
+          >
             <path
               d=${triangle}
               fill=${markerColour}

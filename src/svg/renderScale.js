@@ -1,5 +1,5 @@
 import { svg, nothing } from "lit";
-import { BE, IND, RT, SCALE, VIEW_BOX } from "../const";
+import { BE, IND, MID_BOX, RT, SCALE, VIEW_BOX } from "../const";
 import { countDecimals, getCoordFromDegrees } from "../helpers/utilities";
 import { getDecimalSeparator } from "../localise/maths";
 
@@ -46,7 +46,7 @@ function calcSubdivisions(bigStep) {
 }
 
 export function extendWithRenderScale(RtRingSvg) {
-  RtRingSvg.prototype.renderScale = function (dialOpacity = 1) {
+  RtRingSvg.prototype.renderScale = function (dialOpacity = 1, cutOuts = []) {
     const width = this._ringWidth;
     const targetGrandTicks = this.ring_size === 1 ? 3 : 5;
     const maxTotalTicks = [80, 80, 110, 110, 110, 110][this.ring_size - 1];
@@ -204,12 +204,21 @@ export function extendWithRenderScale(RtRingSvg) {
     // Combine all SVG elements
     return svg`
         <g class="scale">
-          <g class="ticks">
+          <mask id="cut-outs-scale">
+            <rect width=${VIEW_BOX} height=${VIEW_BOX} fill="white" />
+            <g fill="black" stroke="black" stroke-width="0"
+              transform="rotate(${this.ring_type === RT.CLOSED ? 180 : 0} 
+                ${MID_BOX} ${MID_BOX})"
+            >
+              ${cutOuts}
+            </g>
+          </mask>
+          <g class="ticks" mask="url(#cut-outs-scale)">
             ${grandSvg}
             ${majorSvg}
             ${minorSvg}
           </g>
-          <g class="labels">
+          <g class="labels" mask="url(#cut-outs-scale)">
             ${svgLabels} 
           </g> 
         </g>
