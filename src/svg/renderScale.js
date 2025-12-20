@@ -1,6 +1,10 @@
 import { svg, nothing } from "lit";
 import { BE, IND, MID_BOX, RT, SCALE, VIEW_BOX } from "../const";
-import { countDecimals, getCoordFromDegrees } from "../helpers/utilities";
+import {
+  countDecimals,
+  getCoordFromDegrees,
+  roundDecimals,
+} from "../helpers/utilities";
 import { getDecimalSeparator } from "../localise/maths";
 
 // Helper function to calculate a "nice" step size
@@ -68,7 +72,8 @@ export function extendWithRenderScale(RtRingSvg) {
       value <= end;
       value += grandStep
     ) {
-      grand.push(value);
+      const trimmedVal = roundDecimals(value, this.max_decimals + 2);
+      grand.push(trimmedVal);
     }
 
     // Generate Major ticks
@@ -78,9 +83,10 @@ export function extendWithRenderScale(RtRingSvg) {
       value <= end;
       value += majorStep
     ) {
+      const trimmedVal = roundDecimals(value, this.max_decimals + 2);
       // Avoid duplicating Grand ticks
-      if (!grand.includes(value)) {
-        major.push(value);
+      if (!grand.includes(trimmedVal)) {
+        major.push(trimmedVal);
       }
     }
 
@@ -92,9 +98,10 @@ export function extendWithRenderScale(RtRingSvg) {
         value <= end;
         value += minorStep
       ) {
+        const trimmedVal = roundDecimals(value, this.max_decimals + 2);
         // Avoid duplicating Major or Grand ticks
-        if (!grand.includes(value) && !major.includes(value)) {
-          minor.push(value);
+        if (!grand.includes(trimmedVal) && !major.includes(trimmedVal)) {
+          minor.push(trimmedVal);
         }
       }
     }
