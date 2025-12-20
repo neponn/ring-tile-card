@@ -171,10 +171,11 @@ card_mod:
   * `ring`: the ring itself, plus an optional `scale` group, containing:
     * `ticks` and `labels` groups
   * `indicators`: a group containing the indicator and markers:
-    * `dot` indicator consisting of `dot` and `dot-outline`
-    * `arc` indicator consisting of `ring-solid`
-    * `pointer` indicator consists of SVG objects with class names `pointer` and `pointer-centre` contained in a group
-    * `marker` group
+    * `indicator`: a group containing the indicator:
+      * `dot` indicator consisting of `dot`
+      * `arc` indicator consisting of `ring-solid`
+      * `pointer` indicator consists of SVG objects with class names `pointer` and `pointer-centre` contained in a group
+    * `marker` group(s)
 
 The easiest way to find your way around the DOM is to use a browser inspector (F12 / ⌘-shift-C).
 
