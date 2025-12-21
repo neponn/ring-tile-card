@@ -21,6 +21,7 @@ import {
   TE,
   ME,
   IND,
+  MID_BOX,
 } from "./const.js";
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
 
@@ -325,19 +326,23 @@ export class RtRingSvg extends LitElement {
       ringBackgroundOpacity = 0.15;
     }
 
-    // render the ring
-    let ringBackground;
-    if (this.ring_type === RT.NONE) {
-      ringBackground = nothing;
-    } else if (this.ring_type.startsWith(RT.COMPASS)) {
-      ringBackground = this.renderCompass();
-    } else {
-      ringBackground = this.renderGradRing(
-        this._startDegrees,
-        this._endDegrees,
-        ringBackgroundOpacity
-      );
-    }
+    // render the markers
+    const marker =
+      isNumber(this.marker_value) && !this._noState
+        ? this.renderMarker(
+            this.marker_value,
+            `var(--rt-marker-color, var(--rt-marker-colour, ${this.marker_colour}))`,
+            this.compass_marker
+          )
+        : nothing;
+    const marker2 =
+      isNumber(this.marker2_value) && !this._noState
+        ? this.renderMarker(
+            this.marker2_value,
+            `var(--rt-marker2-color, var(--rt-marker2-colour, ${this.marker2_colour}))`,
+            this.compass_marker2
+          )
+        : nothing;
 
     // render the indicator
     let indicatorBottom = nothing;
@@ -348,7 +353,8 @@ export class RtRingSvg extends LitElement {
           indicatorBottom = this.renderSolidRing(
             this._startDegrees,
             statePoint,
-            this.state.value
+            this.state.value,
+            [marker.mask, marker2.mask]
           );
           break;
         case IND.DOT:
@@ -366,26 +372,27 @@ export class RtRingSvg extends LitElement {
     let scale = nothing;
     if (this.scale !== SCALE.NONE) {
       const scaleOpacity = this.indicator === IND.POINTER ? 0.7 : 0.2;
-      scale = this.renderScale(scaleOpacity);
+      scale = this.renderScale(scaleOpacity, [
+        indicatorBottom.mask,
+        marker.mask,
+        marker2.mask,
+      ]);
     }
 
-    // render the markers
-    const marker =
-      isNumber(this.marker_value) && !this._noState
-        ? this.renderMarker(
-            this.marker_value,
-            this.marker_colour,
-            this.compass_marker
-          )
-        : nothing;
-    const marker2 =
-      isNumber(this.marker2_value) && !this._noState
-        ? this.renderMarker(
-            this.marker2_value,
-            this.marker2_colour,
-            this.compass_marker2
-          )
-        : nothing;
+    // render the ring
+    let ringBackground;
+    if (this.ring_type === RT.NONE) {
+      ringBackground = nothing;
+    } else if (this.ring_type.startsWith(RT.COMPASS)) {
+      ringBackground = this.renderCompass();
+    } else {
+      ringBackground = this.renderGradRing(
+        this._startDegrees,
+        this._endDegrees,
+        ringBackgroundOpacity,
+        [indicatorBottom.mask, marker.mask, marker2.mask]
+      ).object;
+    }
 
     // render the top, middle and bottom elements
     const topElementSvg = this.getTopElementSvg();
@@ -405,9 +412,21 @@ export class RtRingSvg extends LitElement {
           ${topElementSvg} ${middleElementSvg} ${bottomElementSvg}
           ${this._iconSvg}
         </g>
-        <g class="ring">${ringBackground} ${scale}</g>
-        <g class="indicators">
-          ${indicatorBottom} ${marker2} ${marker} ${indicatorTop}
+        <g
+          class="ring"
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180 : 0} 
+            ${MID_BOX} ${MID_BOX})"
+        >
+          ${ringBackground}
+        </g>
+        ${scale}
+        <g
+          class="indicators"
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180: 0} 
+            ${MID_BOX} ${MID_BOX})"
+        >
+          ${indicatorBottom.object} ${marker2.object} ${marker.object}
+          ${indicatorTop.object}
         </g>
       </svg>
     `;
@@ -432,7 +451,7 @@ export class RtRingSvg extends LitElement {
       overflow: visible;
     }
     text {
-      font-family: Geist, var(--ha-font-family-body);
+      font-family: var(--rt-font-family, Geist), var(--ha-font-family-body);
       font-optical-sizing: auto;
       font-style: normal;
       color: var(--primary-text-color);
@@ -474,8 +493,23 @@ export class RtRingSvg extends LitElement {
       stroke: var(--primary-text-color, #212121);
     }
     .pointer {
-      stroke: var(--rt-pointer-colour, orange);
-      fill: var(--rt-pointer-colour, orange);
+      stroke: var(
+        --rt-pointer-color,
+        var(
+          --rt-pointer-colour,
+          color-mix(in srgb, orange 90%, var(--primary-text-color))
+        )
+      );
+      fill: var(
+        --rt-pointer-color,
+        var(
+          --rt-pointer-colour,
+          color-mix(in srgb, orange 90%, var(--primary-text-color))
+        )
+      );
+    }
+    .pointer-centre {
+      fill: #444444;
     }
   `;
 }

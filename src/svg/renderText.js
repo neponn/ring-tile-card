@@ -6,12 +6,14 @@ import { getDecimalSeparator } from "../localise/maths";
 // export function renderText(cfg, value, unit, position) {
 export function extendWithRenderText(RtRingSvg) {
   RtRingSvg.prototype.renderText = function (value, unit, position) {
+    const self = this; // Capture the instance context
+
     function scaleFontSize(
       unit = "",
       unitScale = 1.0,
       maxLengthForScaling = 6
     ) {
-      const dp = getDecimalSeparator();
+      const dp = getDecimalSeparator(self.hass.locale);
       const valueLength =
         value.length -
         (value.includes(dp) ? 0.7 : 0) -

@@ -1,5 +1,5 @@
 import { svg } from "lit";
-import { MID_BOX, RT, VIEW_BOX } from "../const";
+import { VIEW_BOX } from "../const";
 import { getRingPath } from "./getRingPath";
 import { getCoordFromDegrees } from "../helpers/utilities";
 
@@ -19,31 +19,27 @@ export function extendWithRenderDot(RtRingSvg) {
       width * 1.1
     );
 
-    return svg`
-            <g class="indicator">
-              <clipPath id="ring-clip">
-                <path d=${ringClipSegment}
-                />
-              </clipPath>
-              <circle 
-                class="dot-outline"
-                cx=${dotCoord[0]} cy=${dotCoord[1]} 
-                r=${dotRadius + dotOutline / 2}
-                clip-path="url(#ring-clip)"
-                fill="var(--card-background-color, white)"
-                transform="rotate(${
-                  this.ring_type === RT.CLOSED ? 180 : 0
-                } ${MID_BOX} ${MID_BOX})"
-              />
-              <circle 
-                class="dot"
-                cx=${dotCoord[0]} cy=${dotCoord[1]} 
-                r=${dotRadius - dotOutline / 2}
-                fill=${this._grad.getSolidColour(rawValue)}
-                transform="rotate(${
-                  this.ring_type === RT.CLOSED ? 180 : 0
-                } ${MID_BOX} ${MID_BOX})"
-              />
-            </g>`;
+    return {
+      object: svg`
+        <g class="indicator">
+          <circle 
+            class="dot"
+            cx=${dotCoord[0]} cy=${dotCoord[1]} 
+            r=${dotRadius - dotOutline / 2}
+            fill=${this._grad.getSolidColour(rawValue)}
+          />
+        </g>`,
+      mask: svg`
+        <clipPath id="dot-clip">
+          <path d=${ringClipSegment}
+          />
+        </clipPath>
+        <circle 
+          cx=${dotCoord[0]} cy=${dotCoord[1]} 
+          r=${dotRadius + dotOutline / 2}
+          clip-path="url(#dot-clip)"
+        />      
+      `,
+    };
   };
 }

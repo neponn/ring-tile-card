@@ -45,11 +45,6 @@ export const DEFAULTS = {
   colourise_icon: false,
   tap_action: {
     action: "more-info",
-    tapped: "info",
-  },
-  icon_tap_action: {
-    action: "more-info",
-    tapped: "icon",
   },
 };
 
