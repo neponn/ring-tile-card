@@ -37,7 +37,7 @@ export function extendWithGetRoundedValue(RtRingSvg) {
     }
     
     // Format using locale-aware formatting (respecting '.' or ',' as needed)
-    const formatted = toLocaleFixed(value, decimals);
+    const formatted = toLocaleFixed(value, decimals, this.hass.locale);
 
     return formatted;
   };

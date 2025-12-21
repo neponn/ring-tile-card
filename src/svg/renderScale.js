@@ -152,7 +152,7 @@ export function extendWithRenderScale(RtRingSvg) {
       const p3 = getCoordFromDegrees(degrees, labelRadius, VIEW_BOX);
 
       const fontSize = this.ring_size === 1 ? width * 2.5 : width * 1.15;
-      const dp = getDecimalSeparator();
+      const dp = getDecimalSeparator(this.hass.locale);
       const localeValue = value.replace(".", dp);
 
       return svg`
