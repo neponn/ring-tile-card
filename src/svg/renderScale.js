@@ -1,6 +1,10 @@
 import { svg, nothing } from "lit";
-import { BE, IND, RT, SCALE, VIEW_BOX } from "../const";
-import { countDecimals, getCoordFromDegrees } from "../helpers/utilities";
+import { BE, IND, MID_BOX, RT, SCALE, VIEW_BOX } from "../const";
+import {
+  countDecimals,
+  getCoordFromDegrees,
+  roundDecimals,
+} from "../helpers/utilities";
 import { getDecimalSeparator } from "../localise/maths";
 
 // Helper function to calculate a "nice" step size
@@ -46,7 +50,7 @@ function calcSubdivisions(bigStep) {
 }
 
 export function extendWithRenderScale(RtRingSvg) {
-  RtRingSvg.prototype.renderScale = function (dialOpacity = 1) {
+  RtRingSvg.prototype.renderScale = function (dialOpacity = 1, cutOuts = []) {
     const width = this._ringWidth;
     const targetGrandTicks = this.ring_size === 1 ? 3 : 5;
     const maxTotalTicks = [80, 80, 110, 110, 110, 110][this.ring_size - 1];
@@ -68,7 +72,8 @@ export function extendWithRenderScale(RtRingSvg) {
       value <= end;
       value += grandStep
     ) {
-      grand.push(value);
+      const trimmedVal = roundDecimals(value, this.max_decimals + 2);
+      grand.push(trimmedVal);
     }
 
     // Generate Major ticks
@@ -78,9 +83,10 @@ export function extendWithRenderScale(RtRingSvg) {
       value <= end;
       value += majorStep
     ) {
+      const trimmedVal = roundDecimals(value, this.max_decimals + 2);
       // Avoid duplicating Grand ticks
-      if (!grand.includes(value)) {
-        major.push(value);
+      if (!grand.includes(trimmedVal)) {
+        major.push(trimmedVal);
       }
     }
 
@@ -92,9 +98,10 @@ export function extendWithRenderScale(RtRingSvg) {
         value <= end;
         value += minorStep
       ) {
+        const trimmedVal = roundDecimals(value, this.max_decimals + 2);
         // Avoid duplicating Major or Grand ticks
-        if (!grand.includes(value) && !major.includes(value)) {
-          minor.push(value);
+        if (!grand.includes(trimmedVal) && !major.includes(trimmedVal)) {
+          minor.push(trimmedVal);
         }
       }
     }
@@ -204,12 +211,21 @@ export function extendWithRenderScale(RtRingSvg) {
     // Combine all SVG elements
     return svg`
         <g class="scale">
-          <g class="ticks">
+          <mask id="cut-outs-scale">
+            <rect width=${VIEW_BOX} height=${VIEW_BOX} fill="white" />
+            <g fill="black" stroke="black" stroke-width="0"
+              transform="rotate(${this.ring_type === RT.CLOSED ? 180 : 0} 
+                ${MID_BOX} ${MID_BOX})"
+            >
+              ${cutOuts}
+            </g>
+          </mask>
+          <g class="ticks" mask="url(#cut-outs-scale)">
             ${grandSvg}
             ${majorSvg}
             ${minorSvg}
           </g>
-          <g class="labels">
+          <g class="labels" mask="url(#cut-outs-scale)">
             ${svgLabels} 
           </g> 
         </g>

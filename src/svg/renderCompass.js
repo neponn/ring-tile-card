@@ -1,4 +1,4 @@
-import { svg } from "lit";
+import { svg, nothing } from "lit";
 import { RT, VIEW_BOX } from "../const";
 import { degreesToCompass, getCoordFromDegrees } from "../helpers/utilities";
 

@@ -21,6 +21,7 @@ import {
   TE,
   ME,
   IND,
+  MID_BOX,
 } from "./const.js";
 import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
 
@@ -325,50 +326,6 @@ export class RtRingSvg extends LitElement {
       ringBackgroundOpacity = 0.15;
     }
 
-    // render the ring
-    let ringBackground;
-    if (this.ring_type === RT.NONE) {
-      ringBackground = nothing;
-    } else if (this.ring_type.startsWith(RT.COMPASS)) {
-      ringBackground = this.renderCompass();
-    } else {
-      ringBackground = this.renderGradRing(
-        this._startDegrees,
-        this._endDegrees,
-        ringBackgroundOpacity
-      );
-    }
-
-    // render the indicator
-    let indicatorBottom = nothing;
-    let indicatorTop = nothing;
-    if (this.ring_type !== RT.NONE && !this._noState) {
-      switch (this.indicator) {
-        case IND.ARC:
-          indicatorBottom = this.renderSolidRing(
-            this._startDegrees,
-            statePoint,
-            this.state.value
-          );
-          break;
-        case IND.DOT:
-          indicatorBottom = this.renderDot(statePoint, this.state.value);
-          break;
-        case IND.POINTER:
-          indicatorTop = this.renderPointer(statePoint);
-          break;
-        case IND.NONE:
-          break;
-      }
-    }
-
-    // render the scale
-    let scale = nothing;
-    if (this.scale !== SCALE.NONE) {
-      const scaleOpacity = this.indicator === IND.POINTER ? 0.7 : 0.2;
-      scale = this.renderScale(scaleOpacity);
-    }
-
     // render the markers
     const marker =
       isNumber(this.marker_value) && !this._noState
@@ -386,6 +343,56 @@ export class RtRingSvg extends LitElement {
             this.compass_marker2
           )
         : nothing;
+
+    // render the indicator
+    let indicatorBottom = nothing;
+    let indicatorTop = nothing;
+    if (this.ring_type !== RT.NONE && !this._noState) {
+      switch (this.indicator) {
+        case IND.ARC:
+          indicatorBottom = this.renderSolidRing(
+            this._startDegrees,
+            statePoint,
+            this.state.value,
+            [marker.mask, marker2.mask]
+          );
+          break;
+        case IND.DOT:
+          indicatorBottom = this.renderDot(statePoint, this.state.value);
+          break;
+        case IND.POINTER:
+          indicatorTop = this.renderPointer(statePoint);
+          break;
+        case IND.NONE:
+          break;
+      }
+    }
+
+    // render the scale
+    let scale = nothing;
+    if (this.scale !== SCALE.NONE) {
+      const scaleOpacity = this.indicator === IND.POINTER ? 0.7 : 0.2;
+      scale = this.renderScale(scaleOpacity, [
+        indicatorBottom.mask,
+        marker.mask,
+        marker2.mask,
+      ]);
+    }
+
+    // render the ring
+    let ringBackground;
+    if (this.ring_type === RT.NONE) {
+      ringBackground = nothing;
+    } else if (this.ring_type.startsWith(RT.COMPASS)) {
+      ringBackground = this.renderCompass();
+    } else {
+      ringBackground = this.renderGradRing(
+        this._startDegrees,
+        this._endDegrees,
+        ringBackgroundOpacity,
+        [indicatorBottom.mask, marker.mask, marker2.mask]
+      ).object;
+    }
 
     // render the top, middle and bottom elements
     const topElementSvg = this.getTopElementSvg();
@@ -405,9 +412,21 @@ export class RtRingSvg extends LitElement {
           ${topElementSvg} ${middleElementSvg} ${bottomElementSvg}
           ${this._iconSvg}
         </g>
-        <g class="ring">${ringBackground} ${scale}</g>
-        <g class="indicators">
-          ${indicatorBottom} ${marker2} ${marker} ${indicatorTop}
+        <g
+          class="ring"
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180 : 0} 
+            ${MID_BOX} ${MID_BOX})"
+        >
+          ${ringBackground}
+        </g>
+        ${scale}
+        <g
+          class="indicators"
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180: 0} 
+            ${MID_BOX} ${MID_BOX})"
+        >
+          ${indicatorBottom.object} ${marker2.object} ${marker.object}
+          ${indicatorTop.object}
         </g>
       </svg>
     `;

@@ -14,7 +14,8 @@ export function extendWithRenderPointer(RtRingSvg) {
       this._outerRadius - this._ringWidth / 2,
       VIEW_BOX
     );
-    return svg`
+    return {
+      object: svg`
         <g class="indicator">
           <line class="pointer"
             x1=${startPoint[0]} y1=${startPoint[1]}
@@ -30,6 +31,7 @@ export function extendWithRenderPointer(RtRingSvg) {
             cx=${MID_BOX} cy=${MID_BOX}
             r=${[3, 2.5, 1.8, 1.8, 1.6, 1.4][this.ring_size - 1]}
         </g>
-      `;
+      `,
+    };
   };
 }
