@@ -73,7 +73,7 @@ export function extendWithRenderMarker(RtRingSvg) {
         commands.push(`M ${MID_BOX} ${VIEW_BOX + width / 3 + strokeWidth}`);
       } else {
         // otherwise, start the tip overlapped with the ring
-        commands.push(`M ${MID_BOX} ${VIEW_BOX - width / 3}`);
+        commands.push(`M ${MID_BOX} ${VIEW_BOX - width / 1.7}`);
       }
       // now plot up and to the right to draw the first side of the triangle
       commands.push(
