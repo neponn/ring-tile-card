@@ -370,6 +370,9 @@ export class RtRingSvg extends LitElement {
       }
     }
 
+    // grab the indicated colour for use with styling
+    const indicatedColour = this._grad.getSolidColour(this.state.value);
+
     // render the scale
     let scale = nothing;
     if (this.scale !== SCALE.NONE) {
@@ -403,6 +406,12 @@ export class RtRingSvg extends LitElement {
 
     // composite the SVG
     return html`
+      <style>
+        :host {
+          --rt-indicated-colour: ${indicatedColour};
+          --rt-indicated-color: ${indicatedColour};
+        }
+      </style>
       <svg
         viewBox="0 0 ${VIEW_BOX} ${VIEW_BOX}"
         preserveAspectRatio="xMidYMid meet"
