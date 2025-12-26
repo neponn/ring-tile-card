@@ -99,7 +99,7 @@ export function extendWithRenderMarker(RtRingSvg) {
 
       return {
         object: svg`
-          <g class=${className} 
+          <g class=${className}
             transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})"
           >
             <path
@@ -110,7 +110,9 @@ export function extendWithRenderMarker(RtRingSvg) {
             />
           </g>`,
         mask: svg`
-          <g transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
+          <g class=${className}
+            transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})"
+          >
             <path
               d=${triangle}
               stroke-linejoin="round"

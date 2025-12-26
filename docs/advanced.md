@@ -152,7 +152,7 @@ bottom_element: none
 card_mod:
   style:
     rt-ring-svg $: |
-      g.marker {
+      .marker {
         visibility: {{ 
           'hidden' if states('binary_sensor.working_at_home') == 'off' 
           else 'visible'
