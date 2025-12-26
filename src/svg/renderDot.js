@@ -22,7 +22,7 @@ export function extendWithRenderDot(RtRingSvg) {
     return {
       object: svg`
         <g class="indicator">
-          <circle 
+          <circle
             class="dot"
             cx=${dotCoord[0]} cy=${dotCoord[1]} 
             r=${dotRadius - dotOutline / 2}
@@ -30,15 +30,18 @@ export function extendWithRenderDot(RtRingSvg) {
           />
         </g>`,
       mask: svg`
-        <clipPath id="dot-clip">
-          <path d=${ringClipSegment}
+        <g class="indicator">
+          <clipPath id="dot-clip">
+            <path d=${ringClipSegment}
+            />
+          </clipPath>
+          <circle
+            class="dot"
+            cx=${dotCoord[0]} cy=${dotCoord[1]} 
+            r=${dotRadius + dotOutline / 2}
+            clip-path="url(#dot-clip)"
           />
-        </clipPath>
-        <circle 
-          cx=${dotCoord[0]} cy=${dotCoord[1]} 
-          r=${dotRadius + dotOutline / 2}
-          clip-path="url(#dot-clip)"
-        />      
+        </g>  
       `,
     };
   };

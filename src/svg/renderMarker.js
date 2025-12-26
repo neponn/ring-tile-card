@@ -73,7 +73,7 @@ export function extendWithRenderMarker(RtRingSvg) {
         commands.push(`M ${MID_BOX} ${VIEW_BOX + width / 3 + strokeWidth}`);
       } else {
         // otherwise, start the tip overlapped with the ring
-        commands.push(`M ${MID_BOX} ${VIEW_BOX - width / 3}`);
+        commands.push(`M ${MID_BOX} ${VIEW_BOX - width / 1.7}`);
       }
       // now plot up and to the right to draw the first side of the triangle
       commands.push(
@@ -99,7 +99,7 @@ export function extendWithRenderMarker(RtRingSvg) {
 
       return {
         object: svg`
-          <g class=${className} 
+          <g class=${className}
             transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})"
           >
             <path
@@ -110,7 +110,9 @@ export function extendWithRenderMarker(RtRingSvg) {
             />
           </g>`,
         mask: svg`
-          <g transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})">
+          <g class=${className}
+            transform="rotate(${degrees} ${MID_BOX} ${MID_BOX})"
+          >
             <path
               d=${triangle}
               stroke-linejoin="round"
