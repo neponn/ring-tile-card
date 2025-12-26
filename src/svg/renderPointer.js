@@ -1,25 +1,26 @@
 import { svg } from "lit";
-import { MID_BOX, RT, VIEW_BOX } from "../const";
-import { getCoordFromDegrees } from "../helpers/utilities";
+import { MID_BOX, RT, TRANSITION, VIEW_BOX } from "../const";
 
 export function extendWithRenderPointer(RtRingSvg) {
   RtRingSvg.prototype.renderPointer = function (degrees) {
-    const startPoint = getCoordFromDegrees(
-      this.ring_type === RT.CLOSED ? degrees : (degrees + 180) % 360,
-      (0.15 * VIEW_BOX) / 2,
-      VIEW_BOX
-    );
-    const endPoint = getCoordFromDegrees(
-      this.ring_type !== RT.CLOSED ? degrees : (degrees + 180) % 360,
-      this._outerRadius - this._ringWidth / 2,
-      VIEW_BOX
-    );
+    degrees = this.ring_type.startsWith(RT.COMPASS)
+      ? (degrees + 180) % 360
+      : degrees;
+    const tail = [MID_BOX, MID_BOX - (0.15 * VIEW_BOX) / 2];
+    const point = [
+      MID_BOX,
+      MID_BOX + this._outerRadius - this._ringWidth / 2,
+    ];
     return {
       object: svg`
-        <g class="indicator">
+        <g class="indicator" 
+          style="transform: rotate(${degrees}deg); 
+            transform-origin: ${MID_BOX}px ${MID_BOX}px; 
+            transition: transform ${TRANSITION};"
+        >
           <line class="pointer"
-            x1=${startPoint[0]} y1=${startPoint[1]}
-            x2=${endPoint[0]}   y2=${endPoint[1]}
+            x1=${tail[0]} y1=${tail[1]}
+            x2=${point[0]}   y2=${point[1]}
             stroke-width=${[5, 3, 2.5, 2.5, 2.3, 2.0][this.ring_size - 1]}
             stroke-linecap="round"
           />

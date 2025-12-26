@@ -332,7 +332,8 @@ export class RtRingSvg extends LitElement {
         ? this.renderMarker(
             this.marker_value,
             `var(--rt-marker-color, var(--rt-marker-colour, ${this.marker_colour}))`,
-            this.compass_marker
+            this.compass_marker,
+            1
           )
         : nothing;
     const marker2 =
@@ -340,7 +341,8 @@ export class RtRingSvg extends LitElement {
         ? this.renderMarker(
             this.marker2_value,
             `var(--rt-marker2-color, var(--rt-marker2-colour, ${this.marker2_colour}))`,
-            this.compass_marker2
+            this.compass_marker2,
+            2
           )
         : nothing;
 
