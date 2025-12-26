@@ -75,11 +75,12 @@ Important to note that the `tweaks` method only supports static styling; if you 
 | `--rt-scale-text-opacity` | `rt-scale-text-opacity` | Text opacity used for scale labels | `0`-`1` | `0.5` |
 | `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | Geist |
 | `--rt-ring-svg-size` | `rt-ring-svg-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
+| `--rt-indicated-colour` | N/A | Provides access to the currently indicated colour. Use to "colourise" other elements to reflect the current state of the ring. *Not settable* | CSS colour code | |
 | N/A | `transparent_tile` | No background and no border | Boolean | `False` |
 | N/A | `tile_rows` | Customise the total height of the `ring-tile` card | `1.0`-`6.0`, card layout row units | `ring_size` row units |
 | N/A | `tile_columns` | Customise the total width of the `ring-tile` card | `1.5`-`12.0`, card layout column units | 6 column units |
 
-Note: `colour` may also be spelled `color`.
+Note: `colour` may also be spelt `color`.
 
 `rt-ring-svg-size`, `transparent_tile`, `tile_rows` and `tile_columns` can be used in combination with other layout cards to build highly customised tiles. For example:
 
