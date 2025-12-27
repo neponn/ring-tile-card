@@ -94,4 +94,4 @@ export const US_SPELLINGS = [
   { US: "colorize_icon", AU: "colourise_icon" },
 ];
 
-export const TRANSITION = "0.5s ease-in-out";
+export const TRANSITION = "0.75s ease-in-out";

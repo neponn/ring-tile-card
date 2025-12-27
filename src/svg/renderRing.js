@@ -1,6 +1,6 @@
-import { svg } from "lit";
-import { MID_BOX, RT, VIEW_BOX } from "../const";
-import { getRingPath } from "./getRingPath";
+import { LitElement, svg } from "lit";
+import { MID_BOX, RT, TRANSITION, VIEW_BOX } from "../const";
+import { getRingPath, getRingPath2 } from "./getRingPath";
 
 export function extendWithRenderRings(RtRingSvg) {
   RtRingSvg.prototype.renderGradRing = function (
@@ -52,7 +52,18 @@ export function extendWithRenderRings(RtRingSvg) {
     cutOuts = []
   ) {
     const width = this._ringWidth;
-    const segment = getRingPath(startAngle, endAngle, this._outerRadius, width);
+    const actualPath = getRingPath2(
+      startAngle,
+      endAngle,
+      this._outerRadius,
+      width
+    );
+    const animatedPath = getRingPath2(
+      startAngle,
+      359.9999 - startAngle,
+      this._outerRadius,
+      width
+    );
 
     return {
       object: svg`
@@ -64,13 +75,49 @@ export function extendWithRenderRings(RtRingSvg) {
             </g>
           </mask>
           <path 
+            d=${animatedPath}
+            style="transition: stroke-dasharray ${TRANSITION}, 
+              stroke ${TRANSITION};"
+            class="solid-ring-animated"
             mask="url(#cut-outs-ring-solid)"
-            d=${segment}
-            fill=${this._grad.getSolidColour(rawValue)}
-            stroke-width="0"
-            fill-opacity="1"
+            stroke=${this._grad.getSolidColour(rawValue)}
+            stroke-width=${width}
+            stroke-opacity="1"
+            stroke-linecap="round"
+            stroke-dashoffset="0"
+            fill="transparent"
+          />
+          <path 
+            d=${actualPath}
+            class="solid-ring-actual"
+            stroke-opacity="0"
+            fill="transparent"
           />
         </g>`,
     };
+  };
+
+  RtRingSvg.prototype.renderRingsUpdateHandler = function (
+    changedProperties,
+    self
+  ) {
+    // Add lifecycle hook to handle animation on updates
+    self._lastRingLength = self._lastRingLength || 0;
+    if (changedProperties.has("state") || changedProperties.has("ring_state")) {
+      // Wait for DOM update, then animate
+      requestAnimationFrame(() => {
+        const animatedPath = self.shadowRoot?.querySelector(
+          ".solid-ring-animated"
+        );
+        const actualPath = self.shadowRoot?.querySelector(".solid-ring-actual");
+        if (actualPath) {
+          const length = actualPath.getTotalLength();
+          if (length !== self._lastRingLength) {
+            animatedPath.style.strokeDasharray = `${length} 10000`; // Animate to visible
+            self._lastRingLength = length;
+          }
+        }
+      });
+    }
   };
 }

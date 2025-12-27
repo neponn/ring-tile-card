@@ -28,6 +28,7 @@ import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
 export class RtRingSvg extends LitElement {
   _iconSvgCache = {};
   _iconSvg = nothing;
+  _updateHandlers = [];
 
   constructor(...args) {
     super(...args);
@@ -41,6 +42,8 @@ export class RtRingSvg extends LitElement {
     extendWithRenderDot(RtRingSvg);
     extendWithRenderCompass(RtRingSvg);
     extendWithGetRoundedValue(RtRingSvg);
+
+    this._updateHandlers.push(this.renderRingsUpdateHandler);
   }
 
   static get properties() {
@@ -296,6 +299,9 @@ export class RtRingSvg extends LitElement {
 
       this.requestUpdate();
     }
+    this._updateHandlers.forEach((handler) => {
+      handler(changedProps, this);
+    });
   }
 
   render() {
@@ -433,7 +439,7 @@ export class RtRingSvg extends LitElement {
         ${scale}
         <g
           class="indicators"
-          transform="rotate(${this.ring_type === RT.CLOSED ? 180: 0} 
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180 : 0} 
             ${MID_BOX} ${MID_BOX})"
         >
           ${indicatorBottom.object} ${marker2.object} ${marker.object}
