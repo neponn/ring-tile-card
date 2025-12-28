@@ -75,6 +75,7 @@ Important to note that the `tweaks` method only supports static styling; if you 
 | `--rt-scale-text-opacity` | `rt-scale-text-opacity` | Text opacity used for scale labels | `0`-`1` | `0.5` |
 | `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | Geist |
 | `--rt-ring-svg-size` | `rt-ring-svg-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
+| `--rt-transition` | `rt-transition` | Override the default transition coding used to animate ring changes | CSS code | `0.75s ease-in-out` |
 | `--rt-indicated-colour` | N/A | Provides access to the currently indicated colour. Use to "colourise" other elements to reflect the current state of the ring. *Not settable* | CSS colour code | |
 | N/A | `transparent_tile` | No background and no border | Boolean | `False` |
 | N/A | `tile_rows` | Customise the total height of the `ring-tile` card | `1.0`-`6.0`, card layout row units | `ring_size` row units |

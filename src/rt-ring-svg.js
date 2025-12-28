@@ -23,11 +23,17 @@ import {
   IND,
   MID_BOX,
 } from "./const.js";
-import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
+import {
+  browserVersion,
+  clamp,
+  degreesToCompass,
+  isNumber,
+} from "./helpers/utilities.js";
 
 export class RtRingSvg extends LitElement {
   _iconSvgCache = {};
   _iconSvg = nothing;
+  _updateHandlers = [];
 
   constructor(...args) {
     super(...args);
@@ -41,6 +47,9 @@ export class RtRingSvg extends LitElement {
     extendWithRenderDot(RtRingSvg);
     extendWithRenderCompass(RtRingSvg);
     extendWithGetRoundedValue(RtRingSvg);
+
+    this._updateHandlers.push(this.renderRingsUpdateHandler);
+    this._updateHandlers.push(this.renderIconReady);
   }
 
   static get properties() {
@@ -260,42 +269,9 @@ export class RtRingSvg extends LitElement {
   }
 
   async updated(changedProps) {
-    // Check if icon or relevant state changed
-    if (
-      changedProps.has("icon") ||
-      changedProps.has("display_state") ||
-      changedProps.has("middle_element") ||
-      changedProps.has("top_element") ||
-      changedProps.has("bottom_element")
-    ) {
-      // Only fetch if needed
-      let stateColourValue;
-      if (this.colourise_icon) {
-        stateColourValue = this.state.value;
-      }
-      this._iconSvg =
-        this.middle_element === ME.ICON
-          ? await this.renderIcon(
-              POS.MIDDLE,
-              this.display_state.stateObj,
-              stateColourValue
-            )
-          : this.top_element === TE.ICON
-          ? await this.renderIcon(
-              POS.TOP,
-              this.display_state.stateObj,
-              stateColourValue
-            )
-          : this.bottom_element === BE.ICON
-          ? await this.renderIcon(
-              POS.BOTTOM,
-              this.display_state.stateObj,
-              stateColourValue
-            )
-          : nothing;
-
-      this.requestUpdate();
-    }
+    this._updateHandlers.forEach((handler) => {
+      handler(changedProps, this);
+    });
   }
 
   render() {
@@ -332,7 +308,8 @@ export class RtRingSvg extends LitElement {
         ? this.renderMarker(
             this.marker_value,
             `var(--rt-marker-color, var(--rt-marker-colour, ${this.marker_colour}))`,
-            this.compass_marker
+            this.compass_marker,
+            1
           )
         : nothing;
     const marker2 =
@@ -340,7 +317,8 @@ export class RtRingSvg extends LitElement {
         ? this.renderMarker(
             this.marker2_value,
             `var(--rt-marker2-color, var(--rt-marker2-colour, ${this.marker2_colour}))`,
-            this.compass_marker2
+            this.compass_marker2,
+            2
           )
         : nothing;
 
@@ -431,7 +409,7 @@ export class RtRingSvg extends LitElement {
         ${scale}
         <g
           class="indicators"
-          transform="rotate(${this.ring_type === RT.CLOSED ? 180: 0} 
+          transform="rotate(${this.ring_type === RT.CLOSED ? 180 : 0} 
             ${MID_BOX} ${MID_BOX})"
         >
           ${indicatorBottom.object} ${marker2.object} ${marker.object}
@@ -439,6 +417,14 @@ export class RtRingSvg extends LitElement {
         </g>
       </svg>
     `;
+  }
+
+  static get _suppressTrickyTransitions() {
+    const bv = browserVersion();
+    return (
+      (bv.name === "Safari" && bv.version < 17) ||
+      (bv.name.startsWith("HA") && parseFloat(bv.version) < 17)
+    );
   }
 
   static styles = css`
@@ -449,6 +435,7 @@ export class RtRingSvg extends LitElement {
       position: relative;
       vertical-align: middle;
       fill: var(--icon-primary-color, currentcolor);
+      --rt-transition: 0.75s ease-in-out;
     }
     svg {
       width: 100%;
@@ -520,5 +507,31 @@ export class RtRingSvg extends LitElement {
     .pointer-centre {
       fill: #444444;
     }
+    .indicator,
+    .marker {
+      transition: transform var(--rt-transition);
+    }
+    .dot {
+      transition: fill var(--rt-transition);
+    }
+    .solid-ring-animated {
+      transition: stroke-dasharray var(--rt-transition),
+        stroke var(--rt-transition);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .indicator,
+      .marker,
+      .dot,
+      .solid-ring-animated {
+        transition: none;
+      }
+    }
+    ${this._suppressTrickyTransitions
+      ? css`
+          .solid-ring-animated {
+            transition: none;
+          }
+        `
+      : css``}
   `;
 }
