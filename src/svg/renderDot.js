@@ -1,5 +1,5 @@
 import { svg } from "lit";
-import { MID_BOX, TRANSITION, VIEW_BOX } from "../const";
+import { MID_BOX, VIEW_BOX } from "../const";
 import { getRingPath } from "./getRingPath";
 import { getCoordFromDegrees } from "../helpers/utilities";
 
@@ -37,14 +37,21 @@ export function extendWithRenderDot(RtRingSvg) {
           style="transform: rotate(${degrees}deg); 
             transform-origin: ${MID_BOX}px ${MID_BOX}px;"
         >
-          <clipPath id="dot-clip">
-            <path d=${ringClipSegment}/>
-          </clipPath>
+          <mask id="dot-mask">
+            <rect width=${VIEW_BOX} height=${VIEW_BOX} fill="black" />
+            <path d=${ringClipSegment} 
+              stroke-width=${width * 1.1}
+              stroke-opacity="1"
+              stroke-linecap="round"
+              fill="transparent" 
+              stroke="white" 
+            />
+          </mask>
           <circle
             class="dot"
             cx=${dotCoord[0]} cy=${dotCoord[1]} 
             r=${dotRadius + dotOutline / 2}
-            clip-path="url(#dot-clip)"
+            mask="url(#dot-mask)"
           />
         </g>
       `,

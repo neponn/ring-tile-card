@@ -1,6 +1,6 @@
 import { svg } from "lit";
-import { CM, IND, MID_BOX, RT, TRANSITION, VIEW_BOX } from "../const";
-import { clamp, deg2rad, getCoordFromDegrees } from "../helpers/utilities";
+import { CM, IND, MID_BOX, RT, VIEW_BOX } from "../const";
+import { clamp, deg2rad } from "../helpers/utilities";
 
 export function extendWithRenderMarker(RtRingSvg) {
   RtRingSvg.prototype.renderMarker = function (

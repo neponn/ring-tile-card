@@ -1,6 +1,6 @@
-import { LitElement, svg } from "lit";
-import { MID_BOX, RT, TRANSITION, VIEW_BOX } from "../const";
-import { getRingPath, getRingPath2 } from "./getRingPath";
+import { svg } from "lit";
+import { VIEW_BOX } from "../const";
+import {  getRingPath } from "./getRingPath";
 
 export function extendWithRenderRings(RtRingSvg) {
   RtRingSvg.prototype.renderGradRing = function (
@@ -10,21 +10,27 @@ export function extendWithRenderRings(RtRingSvg) {
     cutOuts = []
   ) {
     const width = this._ringWidth;
-    const segment = getRingPath(startAngle, endAngle, this._outerRadius, width);
+    const segment = getRingPath(
+      startAngle,
+      endAngle,
+      this._outerRadius,
+      width
+    );
 
     const ringGradient = this._grad.getConicGradientCss(opacity);
 
-    const id = opacity.toString().replace(".", "");
     return {
       object: svg`
         <g class="ring-grad">
-          <clipPath id="ring-clip-${id}">
-            <path
+          <mask id="cut-outs-ring-grad">
+            <path               
+              stroke-width=${width}
+              stroke-opacity="1"
+              stroke-linecap="round"
+              fill="transparent" 
+              stroke="white" 
               d=${segment}
             />
-          </clipPath>
-          <mask id="cut-outs-ring-grad">
-            <rect width=${VIEW_BOX} height=${VIEW_BOX} fill="white" />
             <g fill="black" stroke="black" stroke-width="0">
               ${cutOuts}
             </g>
@@ -32,7 +38,6 @@ export function extendWithRenderRings(RtRingSvg) {
           <foreignObject
             x="0" y="0"
             width=${VIEW_BOX} height=${VIEW_BOX}
-            clip-path="url(#ring-clip-${id})"
             mask="url(#cut-outs-ring-grad)"
           >
             <div
@@ -53,14 +58,14 @@ export function extendWithRenderRings(RtRingSvg) {
   ) {
     const width = this._ringWidth;
     // render the actual solid ring (but which will be invisible)
-    const actualPath = getRingPath2(
+    const actualPath = getRingPath(
       startAngle,
       endAngle,
       this._outerRadius,
       width
     );
     // render the entire ring (which will be partially rendered using dasharray)
-    const animatedPath = getRingPath2(
+    const animatedPath = getRingPath(
       startAngle,
       359.9999 - startAngle,
       this._outerRadius,

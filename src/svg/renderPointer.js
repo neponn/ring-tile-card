@@ -1,5 +1,5 @@
 import { svg } from "lit";
-import { MID_BOX, RT, TRANSITION, VIEW_BOX } from "../const";
+import { MID_BOX, RT, VIEW_BOX } from "../const";
 
 export function extendWithRenderPointer(RtRingSvg) {
   RtRingSvg.prototype.renderPointer = function (degrees) {
@@ -7,10 +7,8 @@ export function extendWithRenderPointer(RtRingSvg) {
       ? (degrees + 180) % 360
       : degrees;
     const tail = [MID_BOX, MID_BOX - (0.15 * VIEW_BOX) / 2];
-    const point = [
-      MID_BOX,
-      MID_BOX + this._outerRadius - this._ringWidth / 2,
-    ];
+    const point = [MID_BOX, MID_BOX + this._outerRadius - this._ringWidth / 2];
+    
     return {
       object: svg`
         <g class="indicator" 

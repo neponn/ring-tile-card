@@ -505,5 +505,14 @@ export class RtRingSvg extends LitElement {
       transition: stroke-dasharray var(--rt-transition),
         stroke var(--rt-transition);
     }
+    @media (prefers-reduced-motion: reduce) {
+      .indicator,
+      .marker,
+      .dot,
+      .solid-ring-animated {
+        animation: none;
+        transition: none;
+      }
+    }
   `;
 }

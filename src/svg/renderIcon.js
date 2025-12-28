@@ -1,5 +1,15 @@
 import { nothing, svg } from "lit";
-import { BE, IND, MDI_ICON_SIZE, ME, POS, RT, SCALE, TE, VIEW_BOX } from "../const";
+import {
+  BE,
+  IND,
+  MDI_ICON_SIZE,
+  ME,
+  POS,
+  RT,
+  SCALE,
+  TE,
+  VIEW_BOX,
+} from "../const";
 import { isNumber } from "../helpers/utilities";
 
 export function extendWithRenderIcon(RtRingSvg) {
