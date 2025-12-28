@@ -23,7 +23,12 @@ import {
   IND,
   MID_BOX,
 } from "./const.js";
-import { clamp, degreesToCompass, isNumber } from "./helpers/utilities.js";
+import {
+  browserVersion,
+  clamp,
+  degreesToCompass,
+  isNumber,
+} from "./helpers/utilities.js";
 
 export class RtRingSvg extends LitElement {
   _iconSvgCache = {};
@@ -414,6 +419,14 @@ export class RtRingSvg extends LitElement {
     `;
   }
 
+  static get _suppressTrickyTransitions() {
+    const bv = browserVersion();
+    return (
+      (bv.name === "Safari" && bv.version < 17) ||
+      (bv.name.startsWith("HA") && parseFloat(bv.version) < 17)
+    );
+  }
+
   static styles = css`
     :host {
       display: var(--ha-icon-display, inline-flex);
@@ -510,9 +523,15 @@ export class RtRingSvg extends LitElement {
       .marker,
       .dot,
       .solid-ring-animated {
-        animation: none;
         transition: none;
       }
     }
+    ${this._suppressTrickyTransitions
+      ? css`
+          .solid-ring-animated {
+            transition: none;
+          }
+        `
+      : css``}
   `;
 }

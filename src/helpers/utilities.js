@@ -67,3 +67,29 @@ export function degreesToCompass(degrees) {
   // Return the corresponding compass point
   return compassPoints[index];
 }
+
+export function browserVersion() {
+  const ua = navigator.userAgent;
+  let name = "Unknown",
+    version = "Unknown";
+
+  if (/edg/i.test(ua)) {
+    name = "Edge";
+    version = ua.match(/edg\/([\d.]+)/i)?.[1];
+  } else if (/chrome|crios/i.test(ua) && !/opr|opera|chromium|edg/i.test(ua)) {
+    name = "Chrome";
+    version = ua.match(/chrome\/([\d.]+)/i)?.[1];
+  } else if (/firefox|fxios/i.test(ua)) {
+    name = "Firefox";
+    version = ua.match(/firefox\/([\d.]+)/i)?.[1];
+  } else if (/io.robbie.homeassistant/i.test(ua) && /like safari/i.test(ua)) {
+    name = "HA";
+    const versionMatch = ua.match(/\s(\w+OS)\s([\d.]+)/i);
+    name += ` ${versionMatch?.[1]};`;
+    version = versionMatch?.[2];
+  } else if (/safari/i.test(ua) && !/chrome|crios|edg|chromium/i.test(ua)) {
+    name = "Safari";
+    version = ua.match(/version\/([\d.]+)/i)?.[1];
+  }
+  return { name, version };
+}
