@@ -93,5 +93,3 @@ export const US_SPELLINGS = [
   { US: "marker2_color", AU: "marker2_colour" },
   { US: "colorize_icon", AU: "colourise_icon" },
 ];
-
-export const TRANSITION = "0.75s ease-in-out";

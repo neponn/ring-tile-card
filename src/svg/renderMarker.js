@@ -71,8 +71,7 @@ export function extendWithRenderMarker(RtRingSvg) {
         return svg`
           <g class=${className} 
             style="transform: rotate(${turns}turn); 
-              transform-origin: ${MID_BOX}px ${MID_BOX}px; 
-              transition: transform ${TRANSITION};"
+              transform-origin: ${MID_BOX}px ${MID_BOX}px;"
           >
             <circle
               cx=${MID_BOX}
@@ -124,8 +123,7 @@ export function extendWithRenderMarker(RtRingSvg) {
         object: svg`
           <g class=${className}
             style="transform: rotate(${turns}turn); 
-              transform-origin: ${MID_BOX}px ${MID_BOX}px; 
-              transition: transform ${TRANSITION};"
+              transform-origin: ${MID_BOX}px ${MID_BOX}px;"
           >
             <path
               d=${triangle}
@@ -137,8 +135,7 @@ export function extendWithRenderMarker(RtRingSvg) {
         mask: svg`
           <g class=${className}
             style="transform: rotate(${turns}turn); 
-              transform-origin: ${MID_BOX}px ${MID_BOX}px; 
-              transition: transform ${TRANSITION};"
+              transform-origin: ${MID_BOX}px ${MID_BOX}px;"
           >
             <path
               d=${triangle}
@@ -159,8 +156,7 @@ export function extendWithRenderMarker(RtRingSvg) {
         object: svg`
           <g class=${className}
             style="transform: rotate(${degrees}deg); 
-              transform-origin: ${MID_BOX}px ${MID_BOX}px; 
-              transition: transform ${TRANSITION};"
+              transform-origin: ${MID_BOX}px ${MID_BOX}px;"
           >
             <line
               x1=${p1[0]} y1=${p1[1]}

@@ -457,6 +457,7 @@ export class RtRingSvg extends LitElement {
       position: relative;
       vertical-align: middle;
       fill: var(--icon-primary-color, currentcolor);
+      --rt-transition: 0.75s ease-in-out;
     }
     svg {
       width: 100%;
@@ -527,6 +528,17 @@ export class RtRingSvg extends LitElement {
     }
     .pointer-centre {
       fill: #444444;
+    }
+    .indicator,
+    .marker {
+      transition: transform var(--rt-transition);
+    }
+    .dot {
+      transition: fill var(--rt-transition);
+    }
+    .solid-ring-animated {
+      transition: stroke-dasharray var(--rt-transition),
+        stroke var(--rt-transition);
     }
   `;
 }

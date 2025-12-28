@@ -15,8 +15,7 @@ export function extendWithRenderPointer(RtRingSvg) {
       object: svg`
         <g class="indicator" 
           style="transform: rotate(${degrees}deg); 
-            transform-origin: ${MID_BOX}px ${MID_BOX}px; 
-            transition: transform ${TRANSITION};"
+            transform-origin: ${MID_BOX}px ${MID_BOX}px;"
         >
           <line class="pointer"
             x1=${tail[0]} y1=${tail[1]}

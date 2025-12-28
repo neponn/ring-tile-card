@@ -52,12 +52,14 @@ export function extendWithRenderRings(RtRingSvg) {
     cutOuts = []
   ) {
     const width = this._ringWidth;
+    // render the actual solid ring (but which will be invisible)
     const actualPath = getRingPath2(
       startAngle,
       endAngle,
       this._outerRadius,
       width
     );
+    // render the entire ring (which will be partially rendered using dasharray)
     const animatedPath = getRingPath2(
       startAngle,
       359.9999 - startAngle,
@@ -76,8 +78,6 @@ export function extendWithRenderRings(RtRingSvg) {
           </mask>
           <path 
             d=${animatedPath}
-            style="transition: stroke-dasharray ${TRANSITION}, 
-              stroke ${TRANSITION};"
             class="solid-ring-animated"
             mask="url(#cut-outs-ring-solid)"
             stroke=${this._grad.getSolidColour(rawValue)}
@@ -101,7 +101,6 @@ export function extendWithRenderRings(RtRingSvg) {
     changedProperties,
     self
   ) {
-    // Add lifecycle hook to handle animation on updates
     self._lastRingLength = self._lastRingLength || 0;
     if (changedProperties.has("state") || changedProperties.has("ring_state")) {
       // Wait for DOM update, then animate
@@ -113,7 +112,7 @@ export function extendWithRenderRings(RtRingSvg) {
         if (actualPath) {
           const length = actualPath.getTotalLength();
           if (length !== self._lastRingLength) {
-            animatedPath.style.strokeDasharray = `${length} 10000`; // Animate to visible
+            animatedPath.style.strokeDasharray = `${length} 10000`;
             self._lastRingLength = length;
           }
         }

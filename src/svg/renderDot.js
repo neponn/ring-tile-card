@@ -23,22 +23,19 @@ export function extendWithRenderDot(RtRingSvg) {
       object: svg`
         <g class="indicator"
           style="transform: rotate(${degrees}deg); 
-            transform-origin: ${MID_BOX}px ${MID_BOX}px; 
-            transition: transform ${TRANSITION};"
+            transform-origin: ${MID_BOX}px ${MID_BOX}px;"
         >
           <circle 
             class="dot"
             cx=${dotCoord[0]} cy=${dotCoord[1]} 
             r=${dotRadius - dotOutline / 2}
-            style="fill: ${this._grad.getSolidColour(rawValue)};
-              transition: fill 0.5s ease-in-out;"
+            style="fill: ${this._grad.getSolidColour(rawValue)};"
           />
         </g>`,
       mask: svg`
         <g class="indicator"
           style="transform: rotate(${degrees}deg); 
-            transform-origin: ${MID_BOX}px ${MID_BOX}px; 
-            transition: transform ${TRANSITION};"
+            transform-origin: ${MID_BOX}px ${MID_BOX}px;"
         >
           <clipPath id="dot-clip">
             <path d=${ringClipSegment}/>
