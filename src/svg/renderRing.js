@@ -84,6 +84,7 @@ export function extendWithRenderRings(RtRingSvg) {
             stroke-width=${width}
             stroke-opacity="1"
             stroke-linecap="round"
+            stroke-dasharray="0 10000"
             stroke-dashoffset="0"
             fill="transparent"
           />
@@ -103,7 +104,7 @@ export function extendWithRenderRings(RtRingSvg) {
   ) {
     self._lastRingLength = self._lastRingLength || 0;
     if (changedProperties.has("state") || changedProperties.has("ring_state")) {
-      // Wait for DOM update, then animate
+      // Wait for DOM to update so that we can access getTotalLength()
       requestAnimationFrame(() => {
         const animatedPath = self.shadowRoot?.querySelector(
           ".solid-ring-animated"

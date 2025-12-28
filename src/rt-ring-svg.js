@@ -44,6 +44,7 @@ export class RtRingSvg extends LitElement {
     extendWithGetRoundedValue(RtRingSvg);
 
     this._updateHandlers.push(this.renderRingsUpdateHandler);
+    this._updateHandlers.push(this.renderIconReady);
   }
 
   static get properties() {
@@ -263,42 +264,6 @@ export class RtRingSvg extends LitElement {
   }
 
   async updated(changedProps) {
-    // Check if icon or relevant state changed
-    if (
-      changedProps.has("icon") ||
-      changedProps.has("display_state") ||
-      changedProps.has("middle_element") ||
-      changedProps.has("top_element") ||
-      changedProps.has("bottom_element")
-    ) {
-      // Only fetch if needed
-      let stateColourValue;
-      if (this.colourise_icon) {
-        stateColourValue = this.state.value;
-      }
-      this._iconSvg =
-        this.middle_element === ME.ICON
-          ? await this.renderIcon(
-              POS.MIDDLE,
-              this.display_state.stateObj,
-              stateColourValue
-            )
-          : this.top_element === TE.ICON
-          ? await this.renderIcon(
-              POS.TOP,
-              this.display_state.stateObj,
-              stateColourValue
-            )
-          : this.bottom_element === BE.ICON
-          ? await this.renderIcon(
-              POS.BOTTOM,
-              this.display_state.stateObj,
-              stateColourValue
-            )
-          : nothing;
-
-      this.requestUpdate();
-    }
     this._updateHandlers.forEach((handler) => {
       handler(changedProps, this);
     });
