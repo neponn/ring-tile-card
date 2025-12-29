@@ -8,6 +8,8 @@ If you haven't used it before, `card-mod` is an awesome plugin that enables you 
 
 There are two ways in which `ring-tile` has been designed for `card-mod` use: [overriding CSS colour variables](#overriding-css-colour-variables) and [manipulating `ring-tile` HTML / SVG elements](#manipulating-ring-tile-html--svg-elements).
 
+In addition, the `tweaks` config option allows for [several customisations](#additional-tweaks-customisations) for advanced users. Lastly, I share a few [handy sensors](#handy-custom-sensors-for-use-with-ring-tiles) that I use with `ring-tile` in my system.
+
 ## Overriding CSS colour variables
 
 Best to start with an example. First, an example of **dynamic** styling. This example makes use of `card_mod` to set a CSS variable based on the state of an entity by using a template.
@@ -69,17 +71,14 @@ Important to note that the `tweaks` method only supports static styling; if you 
 | `--rt-ring-colour` | `rt-ring-colour` | Override the ring colour (most useful for dynamic styling) | CSS colour code | As configured in `colours` config option |
 | `--rt-ring-background-opacity` | `rt-ring-background-opacity` | Opacity used for the ring background  | `0%`-`100%` | depends on ring |
 | `--rt-pointer-colour` | `rt-pointer-colour` | Override the `pointer` colour | CSS colour code | `orange` |
-| `--rt-marker-colour` | `rt-marker-colour` | Override the `marker` colour | CSS colour code | grey |
-| `--rt-marker2-colour` | `rt-marker2-colour` | Override the `marker2` colour | CSS colour code | light grey |
+| `--rt-marker-colour` | `rt-marker-colour` | Override the `marker` colour | CSS colour code | `grey` |
+| `--rt-marker2-colour` | `rt-marker2-colour` | Override the `marker2` colour | CSS colour code | `lightgrey` |
 | `--rt-background-text-opacity` | `rt-background-text-opacity` | Text opacity used for top, bottom and units | `0`-`1` | `0.6` |
 | `--rt-scale-text-opacity` | `rt-scale-text-opacity` | Text opacity used for scale labels | `0`-`1` | `0.5` |
-| `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | Geist |
+| `--rt-font-family` | `rt-font-family` | Override the font used to render the ring (does not apply to info area) | Font name | `Geist` |
 | `--rt-ring-svg-size` | `rt-ring-svg-size` | Override the overall size of the ring enabling arbitrary scaling. **Caution!** may cause unappealling results! | Size literal (eg `53px`) | Scales with `ring_size` |
 | `--rt-transition` | `rt-transition` | Override the default transition coding used to animate ring changes | CSS code | `0.75s ease-in-out` |
 | `--rt-indicated-colour` | N/A | Provides access to the currently indicated colour. Use to "colourise" other elements to reflect the current state of the ring. *Not settable* | CSS colour code | |
-| N/A | `transparent_tile` | No background and no border | Boolean | `False` |
-| N/A | `tile_rows` | Customise the total height of the `ring-tile` card | `1.0`-`6.0`, card layout row units | `ring_size` row units |
-| N/A | `tile_columns` | Customise the total width of the `ring-tile` card | `1.5`-`12.0`, card layout column units | 6 column units |
 
 Note: `colour` may also be spelt `color`.
 
@@ -180,6 +179,57 @@ card_mod:
     * `marker` group(s)
 
 The easiest way to find your way around the DOM is to use a browser inspector (F12 / ⌘-shift-C).
+
+## Additional `tweaks` customisations
+
+The `tweaks` config option has been reserved for several customisation options requested by advanced users. These are generally not as easy to use, nor as robust, as the main config options. They should be used with care.
+
+| `tweaks` option | Purpose | Type | Default |
+|-----------------|---------|------|---------|
+| `transparent_tile` | No background and no border | boolean | `false` |
+| `tile_rows` | Customise the total height of the `ring-tile` card | `1.0`-`6.0`, card layout row units | `ring_size` row units |
+| `tile_columns` | Customise the total width of the `ring-tile` card | `1.5`-`12.0`, card layout column units | `6` column units |
+| `scale` | Influence the scale generation algorithm (see [below]()) | map | |
+| `rt-*` | Shortcuts to CSS variables for static styling (see [above](#css-variables-available)) | string | |
+
+### `scale` options
+
+When a scale is added to a ring, an algorithm is used to determine the make up of the scale. The algorithm prioritises legibility for the majority of cases, adapting to the ring size and the min / max ranges. But sometimes the algorithm will come up with something sub-optimal or that doesn't suit your aesthetic. For these cases, you can influence the algorithm, using `scale` options:
+
+| `scale` option | Purpose | Type | Default |
+|-----------------|---------|------|---------|
+| `target_grand_ticks` | The number of grand ticks the algorithm should achieve; actual number will be closest possible (above or below) | integer | `3`-`8` |
+| `max_total_ticks` | Only include minor ticks if the total number of ticks does not exceed this | integer | `80`-`110` |
+| `include_minor_ticks` | Include (or exclude) minor ticks, overriding the algorithm | boolean | |
+| `max_labels` | Only include major labels if the total number of labels does not exceed this | integer | `3`-`14` |
+
+**Note**: defaults depend on ring size and other factors.
+
+Composition of the scale is as follows:
+
+* Ticks - grand, major and minor
+  * Grand and major ticks always included
+* Labels - grand and major
+  * Grand labels always included
+
+Example of scale algorithm tweaks:
+
+<img src="img/ad-scale-tweaks.png" width="250">
+
+Config as follows. Compared to the default, `tweaks` caused more grand ticks to be generated and minor ticks to be hidden:
+
+```yaml
+type: custom:ring-tile
+entity: sensor.outside_temperature
+ring_size: 4
+min: 11
+max: 28
+scale: ticks_with_labels
+tweaks:
+  scale:
+    target_grand_ticks: 8
+    max_total_ticks: 70
+```
 
 ## Handy custom sensors for use with ring-tiles
 

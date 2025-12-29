@@ -315,6 +315,7 @@ export class RingTile extends LitElement {
                 .max=${this._maxValue}
                 .min_sig_figs=${this._config.min_sig_figs}
                 .max_decimals=${this._config.max_decimals}
+                .tweaks=${this._config.tweaks}
                 .hass=${this._hass}
               ></rt-ring-svg>
               ${this._noState

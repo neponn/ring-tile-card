@@ -52,8 +52,12 @@ function calcSubdivisions(bigStep) {
 export function extendWithRenderScale(RtRingSvg) {
   RtRingSvg.prototype.renderScale = function (dialOpacity = 1, cutOuts = []) {
     const width = this._ringWidth;
-    const targetGrandTicks = this.ring_size === 1 ? 3 : 5;
-    const maxTotalTicks = [80, 80, 110, 110, 110, 110][this.ring_size - 1];
+    const tweaks = this.tweaks?.scale || {};
+    const targetGrandTicks =
+      tweaks.target_grand_ticks ?? [3, 5, 5, 7, 8, 8][this.ring_size - 1];
+    const maxTotalTicks =
+      tweaks.max_total_ticks ??
+      [80, 80, 110, 110, 110, 110][this.ring_size - 1];
 
     const start = this.min;
     const end = this.max;
@@ -63,7 +67,13 @@ export function extendWithRenderScale(RtRingSvg) {
     const grandStep = calcNiceNum(niceRange / (targetGrandTicks - 1), true);
     const [majorStep, minorStep] = calcSubdivisions(grandStep);
 
-    const produceMinorSteps = Math.round(range / minorStep) < maxTotalTicks;
+    let produceMinorSteps = Math.round(range / minorStep) <= maxTotalTicks;
+    if (tweaks.include_minor_ticks === false) produceMinorSteps = false;
+    if (
+      tweaks.include_major_labels === true &&
+      tweaks.max_total_ticks === undefined
+    )
+      produceMinorSteps = true;
 
     // Generate Grand ticks
     const grand = [];
@@ -130,7 +140,7 @@ export function extendWithRenderScale(RtRingSvg) {
     const renderLabel = (value) => {
       // Avoid duplicate labels for min/max
       if (this.bottom_element === BE.MIN_MAX) {
-        if (value === this.min || value === this.max) {
+        if (value == this.min || value == this.max) {
           return nothing;
         }
       }
@@ -194,11 +204,27 @@ export function extendWithRenderScale(RtRingSvg) {
     let svgLabels = nothing;
     if (this.scale === SCALE.TICKS_LABELS) {
       let labels = [...grand];
-      if (this.ring_size > 3 && grandStep / majorStep !== 5) {
-        // add major labels
+      // figure out max length of major labels
+      const majorLength = major.reduce(
+        (max, value) =>
+          Math.max(
+            max,
+            value.toFixed(countDecimals(value, this.max_decimals)).length
+          ),
+        0
+      );
+
+      // add major labels if not too many
+      const maxLabels =
+        tweaks.target_max_labels ??
+        [3, 10, 12, 13, 14, 14][this.ring_size - 1] - (majorLength - 2);
+      if (
+        tweaks.include_major_labels ||
+        grand.length + major.length <= maxLabels
+      ) {
         labels = [...labels, ...major];
       }
-      // figure out decimal places needed
+      // figure out final decimal places needed
       const places = labels.reduce(
         (max, value) => Math.max(max, countDecimals(value, this.max_decimals)),
         0
