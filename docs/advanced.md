@@ -205,11 +205,11 @@ When a scale is added to a ring, an algorithm is used to determine the make up o
 
 **Note**: defaults depend on ring size and other factors.
 
-Composition of the scale is as follows:
+Composition of the scale as follows:
 
-* Ticks - grand, major and minor
+* **Ticks** - grand, major and minor
   * Grand and major ticks always included
-* Labels - grand and major
+* **Labels** - grand and major
   * Grand labels always included
 
 Example of scale algorithm tweaks:

@@ -1,6 +1,7 @@
-import { svg } from "lit";
+import { nothing, svg } from "lit";
 import { VIEW_BOX } from "../const";
-import {  getRingPath } from "./getRingPath";
+import { getRingPath } from "./getRingPath";
+import { isNumber } from "../helpers/utilities";
 
 export function extendWithRenderRings(RtRingSvg) {
   RtRingSvg.prototype.renderGradRing = function (
@@ -10,12 +11,7 @@ export function extendWithRenderRings(RtRingSvg) {
     cutOuts = []
   ) {
     const width = this._ringWidth;
-    const segment = getRingPath(
-      startAngle,
-      endAngle,
-      this._outerRadius,
-      width
-    );
+    const segment = getRingPath(startAngle, endAngle, this._outerRadius, width);
 
     const ringGradient = this._grad.getConicGradientCss(opacity);
 
@@ -56,6 +52,9 @@ export function extendWithRenderRings(RtRingSvg) {
     rawValue,
     cutOuts = []
   ) {
+    // check we've got a good inputs
+    if (!isNumber(endAngle) || !isNumber(rawValue)) return nothing;
+    
     const width = this._ringWidth;
     // render the actual solid ring (but which will be invisible)
     const actualPath = getRingPath(
