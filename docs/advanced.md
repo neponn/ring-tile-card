@@ -189,7 +189,7 @@ The `tweaks` config option has been reserved for several customisation options r
 | `transparent_tile` | No background and no border | boolean | `false` |
 | `tile_rows` | Customise the total height of the `ring-tile` card | `1.0`-`6.0`, card layout row units | `ring_size` row units |
 | `tile_columns` | Customise the total width of the `ring-tile` card | `1.5`-`12.0`, card layout column units | `6` column units |
-| `scale` | Influence the scale generation algorithm (see [below]()) | map | |
+| `scale` | Influence the scale generation algorithm (see [below](#scale-options)) | map | |
 | `rt-*` | Shortcuts to CSS variables for static styling (see [above](#css-variables-available)) | string | |
 
 ### `scale` options
