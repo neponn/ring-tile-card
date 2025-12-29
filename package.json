@@ -23,7 +23,7 @@
     "parcel": "^2.16.3"
   },
   "dependencies": {
-    "lit": "^3.3.1"
+    "lit": "^3.3.2"
   },
   "bugs": {
     "url": "https://github.com/neponn/ring-tile-card/issues"
