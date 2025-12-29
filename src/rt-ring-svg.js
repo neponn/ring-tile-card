@@ -78,6 +78,7 @@ export class RtRingSvg extends LitElement {
       bottom_name: { attribute: false },
       min_sig_figs: { attribute: false },
       max_decimals: { attribute: false },
+      tweaks: { attribute: false },
       hass: { attribute: false },
     };
   }
