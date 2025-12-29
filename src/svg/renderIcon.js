@@ -1,5 +1,15 @@
-import { svg } from "lit";
-import { BE, IND, MDI_ICON_SIZE, POS, RT, SCALE, VIEW_BOX } from "../const";
+import { nothing, svg } from "lit";
+import {
+  BE,
+  IND,
+  MDI_ICON_SIZE,
+  ME,
+  POS,
+  RT,
+  SCALE,
+  TE,
+  VIEW_BOX,
+} from "../const";
 import { isNumber } from "../helpers/utilities";
 
 export function extendWithRenderIcon(RtRingSvg) {
@@ -84,13 +94,15 @@ export function extendWithRenderIcon(RtRingSvg) {
           const svg = haSvgIcon?.shadowRoot?.querySelector("svg");
           const path = svg?.querySelector("path");
           if (path) {
-            const vbSize =
-              svg.getAttribute("viewBox")?.split(" ")[3] || MDI_ICON_SIZE;
+            const viewBox = svg.getAttribute("viewBox");
+            const [x, y, width, height] = viewBox
+              ? viewBox.split(" ").map(Number)
+              : [0, 0, MDI_ICON_SIZE, MDI_ICON_SIZE];
             const d = path.getAttribute("d");
 
             // Cache the result for this icon + card-mod state so we don't
             // repeatedly re-extract while the values are unchanged.
-            const res = { d, vbSize };
+            const res = { d, x, y, width, height };
             try {
               this._iconSvgCache[cacheKey] = res;
             } catch (e) {
@@ -101,7 +113,13 @@ export function extendWithRenderIcon(RtRingSvg) {
             resolve(res);
           } else if (attempts >= maxAttempts) {
             clearInterval(interval);
-            resolve({ d: null, vbSize: null }); // Not found
+            resolve({
+              d: null,
+              x: 0,
+              y: 0,
+              width: MDI_ICON_SIZE,
+              height: MDI_ICON_SIZE,
+            }); // Not found
           }
           attempts++;
         }, 50);
@@ -162,16 +180,64 @@ export function extendWithRenderIcon(RtRingSvg) {
 
     const iconSvg = await getIconSvg.call(this, this.icon, this.hass);
 
-    scale *= MDI_ICON_SIZE / parseFloat(iconSvg.vbSize);
-    const iconTranslate = VIEW_BOX / 2 - (iconSvg.vbSize / 2) * scale;
+    scale *= MDI_ICON_SIZE / iconSvg.width;
+    const iconTranslateX =
+      VIEW_BOX / 2 - (iconSvg.width / 2) * scale - iconSvg.x * scale;
+    const iconTranslateY =
+      VIEW_BOX / 2 -
+      (iconSvg.height / 2) * scale -
+      iconSvg.y * scale +
+      translateDown;
 
     return svg`
       <path 
         d=${iconSvg.d}
         fill=${stateColour || baseColour}
         transform=
-          "translate(${iconTranslate}, ${iconTranslate + translateDown})
+          "translate(${iconTranslateX}, ${iconTranslateY})
           scale(${scale}, ${scale})" 
       />`;
+  };
+
+  RtRingSvg.prototype.renderIconReady = async function (
+    changedProperties,
+    self
+  ) {
+    // Check if icon or relevant state changed
+    if (
+      changedProperties.has("icon") ||
+      changedProperties.has("display_state") ||
+      changedProperties.has("middle_element") ||
+      changedProperties.has("top_element") ||
+      changedProperties.has("bottom_element")
+    ) {
+      // Only fetch if needed
+      let stateColourValue;
+      if (self.colourise_icon) {
+        stateColourValue = self.state.value;
+      }
+      self._iconSvg =
+        self.middle_element === ME.ICON
+          ? await self.renderIcon(
+              POS.MIDDLE,
+              self.display_state.stateObj,
+              stateColourValue
+            )
+          : self.top_element === TE.ICON
+          ? await self.renderIcon(
+              POS.TOP,
+              self.display_state.stateObj,
+              stateColourValue
+            )
+          : self.bottom_element === BE.ICON
+          ? await self.renderIcon(
+              POS.BOTTOM,
+              self.display_state.stateObj,
+              stateColourValue
+            )
+          : nothing;
+
+      self.requestUpdate();
+    }
   };
 }

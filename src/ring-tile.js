@@ -243,12 +243,11 @@ export class RingTile extends LitElement {
         }
       });
     }
+    styles["width"] = `var(--rt-ring-svg-size, ${ringPixels}px)`;
+    styles["height"] = `var(--rt-ring-svg-size, ${ringPixels}px)`;
 
     const renderString = html`
-      <ha-card
-        class="active ${classMap(cardClasses)}"
-        style=${styleMap(styles)}
-      >
+      <ha-card class="active ${classMap(cardClasses)}">
         <div
           class="background"
           @pointerdown=${(ev) => this._onPointerDown(ev, "card")}
@@ -290,8 +289,7 @@ export class RingTile extends LitElement {
               )}
             >
               <rt-ring-svg
-                style="width: var(--rt-ring-svg-size, ${ringPixels}px);
-                  height: var(--rt-ring-svg-size, ${ringPixels}px);"
+                style=${styleMap(styles)}
                 slot="icon"
                 ring_type=${this._config.ring_type}
                 ring_size=${this._config.ring_size}
@@ -317,6 +315,7 @@ export class RingTile extends LitElement {
                 .max=${this._maxValue}
                 .min_sig_figs=${this._config.min_sig_figs}
                 .max_decimals=${this._config.max_decimals}
+                .tweaks=${this._config.tweaks}
                 .hass=${this._hass}
               ></rt-ring-svg>
               ${this._noState
